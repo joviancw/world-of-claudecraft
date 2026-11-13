@@ -2259,8 +2259,8 @@ export class Sim {
       // Deliberately NOT defaulted: undefined is the "no day/night clock" world
       // (dayNightPhase() answers null), which tests and the RL env rely on.
       dayNightNowMs: cfg.dayNightNowMs,
-      // Carried through so the renderer (which reaches the Sim as IWorld) can read
-      // the same custom world via sim.cfg.world. Undefined for the built-in world.
+      privateRealm: cfg.privateRealm ?? null,
+      // Carried through so the renderer (as IWorld) reads the custom world via sim.cfg.world.
       world: cfg.world,
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,

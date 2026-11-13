@@ -16,20 +16,24 @@
 //   chance-based crafting outcome audit).
 // - itemTracked -> item_ledger.ts recordItemTracked (item_ledger, the
 //   tracked epic/legendary copy provenance ledger: mints and transfers).
+// - levelup -> private_realm_pace.ts observePrivateRealmPace (a log line,
+//   private realms only; the level_up_events row stays in game.ts).
 
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type CraftRollWho, recordCraftRoll } from './craft_roll_events';
 import { recordItemTracked } from './item_ledger';
+import { observePrivateRealmPace, type PaceSimView, type PaceWho } from './private_realm_pace';
 import { recordFtueDeath, recordFtueQuest } from './progress_events';
 
 /** The session fields the record writers read (progress_events.ts
  *  ProgressEventWho and craft_roll_events.ts CraftRollWho are the same
  *  shape); game.ts's ClientSession satisfies it structurally. */
-export type EventRecordWho = CraftRollWho;
+export type EventRecordWho = CraftRollWho & PaceWho;
 
-/** The one sim read the FTUE arms need: the live entity map (the player's
- *  level). Structural so a test passes a bare Map without building a Sim. */
-export interface EventRecordSimView {
+/** The sim reads the arms need: the live entity map (the player's level for
+ *  FTUE) and, for the pace arm, the clock and player metas. Structural so a
+ *  test passes bare Maps without building a Sim. */
+export interface EventRecordSimView extends Partial<PaceSimView> {
   readonly entities: Map<number, Entity>;
 }
 
@@ -67,5 +71,9 @@ export function observeEventRecords<S extends EventRecordWho>(
   if (ev.type === 'itemTracked' && ev.pid !== undefined) {
     const s = clients.get(ev.pid);
     if (s) recordItemTracked(s, ev);
+    return;
+  }
+  if (ev.type === 'levelup' && sim.players && sim.time !== undefined) {
+    observePrivateRealmPace(ev, { time: sim.time, players: sim.players }, clients);
   }
 }

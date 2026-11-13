@@ -11,6 +11,7 @@ import {
   type VaultConsumptionAdmission,
 } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { privateRealmRules } from './private_realm_config';
 import { nextRaidResetMs, nextWeeklyRaidResetMs } from './raid_reset';
 import { REALM_RESET_TIME_ZONE } from './realm';
 import { STORAGE_PRICES } from './storage_prices';
@@ -33,6 +34,7 @@ export function buildRealmSimConfig(
     noPlayer: true,
     devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
     worldPvpDisabled: process.env.WORLD_PVP_DISABLED === '1',
+    privateRealm: privateRealmRules(),
     // Thunzharr is up as soon as the realm boots; subsequent rises keep the
     // normal interval cadence (see src/sim/world_boss.ts).
     // Live realm: legacy fresh mainland rows get ferried through the Proving

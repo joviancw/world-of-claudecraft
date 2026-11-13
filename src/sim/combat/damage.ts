@@ -61,6 +61,7 @@ import {
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { isBuddyMob } from '../pet/buddy_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
+import { privateRealmXpAmount } from '../private_realm';
 import {
   recordCorpseHarvestDeath,
   releaseCorpseHarvest,
@@ -2046,6 +2047,8 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
+  amount = privateRealmXpAmount(ctx.cfg.privateRealm, amount, opts?.fromKill === true);
+  if (amount <= 0) return;
   if (!ctx.worldPvpDisabled) amount = worldPvpXpAmount(amount, meta.worldPvp);
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested

@@ -5,6 +5,7 @@ import type { PurchaseParcelView } from './mail/purchase_parcels';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
 import type { MaterialComposition } from './material_sources';
+import type { PrivateRealmRules } from './private_realm';
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
@@ -12761,6 +12762,9 @@ export interface SimConfig {
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
+  // Private-realm rules (src/sim/private_realm.ts; server env PRIVATE_REALM=1).
+  // Unset or null everywhere else, which leaves every private-realm rule inert.
+  privateRealm?: PrivateRealmRules | null;
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Host randomness for the per-copy guid of a tracked (epic or legendary)
   // item (item_tracking.ts): the server binds crypto.randomUUID, the offline

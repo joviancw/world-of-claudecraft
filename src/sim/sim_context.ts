@@ -30,6 +30,7 @@ import { materialItemIds } from './material_ids';
 import type { MusterArmyState } from './mirefen_muster';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { ObjectMoves } from './moved_objects';
+import type { PrivateRealmRules } from './private_realm';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
@@ -121,9 +122,12 @@ export type RuntimeSimConfig = Required<
     // Deliberately NOT defaulted: undefined is the "no day/night clock" world
     // (dayNightPhase() answers null), which tests and the RL env rely on.
     | 'dayNightNowMs'
+    | 'privateRealm'
   >
 > &
   Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'mintItemGuid' | 'dayNightNowMs'> & {
+    // null on every stock world: the private-realm rules are inert.
+    privateRealm: PrivateRealmRules | null;
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };
