@@ -54,6 +54,7 @@ import { placeOnPatrolPoint, stampDungeonPatrol } from '../mob/patrol';
 import { tickTrashKits } from '../mob/trash_kit';
 import { dungeonDoorPos } from '../moved_objects';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
+import { privateRealmRaidAdmits } from '../private_realm';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { DAILY_LOCKOUT_RAID_ROOMS, isRaidRoom, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
 import type { InstanceSlot, Party, PlayerMeta } from '../sim';
@@ -91,6 +92,7 @@ import {
 } from './ignivar_entry';
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
+import { tickPrivateRealmScaling } from './private_realm_scaling';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 import {
   durableMemberKey,
@@ -449,7 +451,14 @@ export function enterDungeon(
   }
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
-  if (party?.raid && !raidAllowed) {
+  if (
+    party?.raid &&
+    !raidAllowed &&
+    !privateRealmRaidAdmits(
+      ctx.cfg.privateRealm,
+      party.members.map((memberId) => ctx.entities.get(memberId)?.level ?? 0),
+    )
+  ) {
     deny(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return false;
   }
@@ -1646,6 +1655,9 @@ export function updateInstances(ctx: SimContext): void {
   // The optional lore guides (dungeon_guide): after every encounter, so a boss
   // pulled or killed this tick already reads as such. Draws no shared rng.
   tickDungeonGuides(ctx);
+  // Private realms only: scale a raid-run five-player claim's mobs, after every
+  // spawn site above has registered this tick's adds. Draws no rng.
+  tickPrivateRealmScaling(ctx, (dungeonId) => RAID_ALLOWED_DUNGEON_IDS.has(dungeonId));
   if (ctx.tickCount % 20 !== 0) return; // once a second
   retryPendingDifficultyChanges(ctx);
   updateIgnivarRaidProgression(ctx);

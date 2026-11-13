@@ -16,6 +16,12 @@ function sim(privateRealm: ReturnType<typeof resolvePrivateRealmRules> | null = 
   return new Sim({ seed: 42, playerClass: 'warrior', privateRealm });
 }
 
+function primaryMeta(s: Sim) {
+  const meta = s.players.get(s.player.id);
+  if (!meta) throw new Error('expected the primary player meta');
+  return meta;
+}
+
 describe('privateRealmXpAmount', () => {
   it('returns the amount untouched without rules', () => {
     expect(privateRealmXpAmount(null, 123, true)).toBe(123);
@@ -46,8 +52,9 @@ describe('grantXp on a private realm', () => {
 
   it('applies the kill multiplier to a kill award before rested', () => {
     const s = sim(resolvePrivateRealmRules({ leveling: { killXpMultiplier: 2 } }));
-    s.primary.restedXp = 0;
-    s.grantXp(50, s.primary, { fromKill: true });
+    const meta = primaryMeta(s);
+    meta.restedXp = 0;
+    s.grantXp(50, meta, { fromKill: true });
     expect(s.xp).toBe(100);
   });
 
@@ -55,7 +62,7 @@ describe('grantXp on a private realm', () => {
     const s = sim(resolvePrivateRealmRules({ leveling: { questXpMultiplier: 2 } }));
     s.grantXp(xpForLevel(1));
     expect(s.player.level).toBe(2);
-    expect(s.primary.counters.levelUps).toBe(1);
+    expect(primaryMeta(s).counters.levelUps).toBe(1);
   });
 });
 

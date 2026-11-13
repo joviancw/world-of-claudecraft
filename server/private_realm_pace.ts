@@ -27,14 +27,14 @@ export interface PaceWho {
   readonly name?: string;
 }
 
-export interface PaceSample {
+export type PaceSample = {
   characterId: number;
   characterName: string | null;
   level: number;
   lifetimeXp: number;
   playedSeconds: number;
   questsCompleted: number;
-}
+};
 
 export function paceSample(
   who: PaceWho,

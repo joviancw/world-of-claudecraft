@@ -62,16 +62,41 @@ in `src/sim/types.ts`.
 - Known cosmetic gap: quest windows show the authored `xpReward`, not the
   multiplied award.
 
+## Eight-player dungeons (M2)
+
+- Admission: `enterDungeon` (`src/sim/instances/dungeons.ts`) keeps its
+  "Raid groups cannot enter standard dungeons." gate, except when
+  `privateRealmRaidAdmits` passes: private realm on, at most `targetPlayers`
+  members, every member at least `minimumLevel`. Raids already enter the
+  ten-player raid rooms, so those need no change. Five-player parties and
+  leveling groups keep every stock rule.
+- Form the group by converting a full party of five to a raid, then invite up
+  to three more (raid subgroups hold five each, so eight is groups 1 and 2).
+- Shared instance: the claim key is `party:<id>`, so all eight join one claim.
+- Scaling: `tickPrivateRealmScaling` (`src/sim/instances/private_realm_scaling.ts`)
+  runs every tick from `updateInstances`, after the encounter ticks. For each
+  claim whose owning party is a raid larger than a party in a non-raid dungeon,
+  it stamps each mob in `mobIds` once (`Entity.privateRealmScaled`): max and
+  current health (fraction kept), the damage floor, melee weapon damage, and
+  the mechanic, ranged, burn and heal multipliers. Every spawn path registers
+  in `mobIds`, so trash, boss adds and encounter summons are all covered. No
+  rng draws; a stock world returns immediately.
+- Decision: scale follows the live roster rather than freezing at claim time,
+  so a raid that grows past five mid-run scales its remaining mobs on the next
+  tick. A mob is never scaled twice, and never un-scaled if the raid shrinks.
+- The quoted denial text is unchanged, so no new i18n strings were needed.
+
 ## Test log
 
 | Date | Command | Result |
 |---|---|---|
 | 2026-11-12 | `npx tsc --noEmit` (baseline) | pass |
 | 2026-11-12 | `npx vitest run tests/private_realm_xp.test.ts tests/server/private_realm_pace.test.ts tests/xp.test.ts tests/progression_xp.test.ts tests/rested_xp.test.ts tests/server/craft_roll_events.test.ts tests/server/item_ledger.test.ts tests/monolith_budget.test.ts tests/architecture.test.ts` | 225 passed |
+| 2026-11-12 | `npx vitest run tests/private_realm_dungeons.test.ts tests/private_realm_xp.test.ts` | 17 passed |
+| 2026-11-12 | `npx vitest run tests/dungeons.test.ts tests/raid_return.test.ts tests/party_machine.test.ts tests/gravewyrm_normal_tuning.test.ts tests/trash_engine.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts tests/localization_fixes.test.ts tests/parity` | 599 passed; 1 timeout (heroic loot seed sweep, passes alone in 34 s) and the i18n guard needing `npm run i18n:gen` first (passes after) |
 
 ## Outstanding
 
-- M2 eight-player dungeon admission and scaling.
 - M3 eight-bot end-to-end script.
 - M4 all dungeons, Heroic, the raid.
 - M5 to M7 custom awards, Book of Deeds view, titles.

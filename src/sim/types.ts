@@ -8111,6 +8111,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // undefined = 1 (untuned, and every heroic spawn, which keeps its shipped
   // calibration).
   rangedDamageMult?: number;
+  // Set once instances/private_realm_scaling.ts has applied the eight-player
+  // raid scale to this mob, so the per-tick pass never stacks it.
+  privateRealmScaled?: boolean;
   // Entity-level CC/snare immunity, the per-spawn twin of the MobTemplate
   // ccImmune/slowImmune flags (which are read from the base MOBS table, so a
   // spawn-time template transform cannot grant them). Heroic instances set
