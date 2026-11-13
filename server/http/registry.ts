@@ -29,6 +29,7 @@ import { routes as authRoutes } from '../auth_routes';
 import { routes as battlegroundRoutes } from '../battleground';
 import { routes as characterRoutes } from '../characters';
 import { routes as claudiumRoutes } from '../claudium';
+import { routes as customAwardsRoutes } from '../custom_awards_routes';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as deedsRoutes } from '../deeds';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
@@ -162,6 +163,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...wocMarketRoutes,
   ...guildRosterRoutes,
   ...worldQuestLeaderboardRoutes,
+  ...customAwardsRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

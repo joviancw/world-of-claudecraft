@@ -13,6 +13,11 @@ import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
 import {
+  CUSTOM_AWARDS_SLOT_CLASS,
+  CUSTOM_AWARDS_SLOT_HTML,
+  CustomAwardsSection,
+} from './custom_awards_section';
+import {
   borderAccent,
   DEED_HERALDRY_ATTR,
   DEED_HERALDRY_MOTIF_ATTR,
@@ -137,6 +142,9 @@ export interface DeedsWindowDeps extends PainterHostPresentation {
 
 export class DeedsWindow {
   private opened = false;
+  // The private realm's player-awarded achievements, painted into a slot on
+  // the titles shelf after every rebuild (custom_awards_section.ts).
+  private readonly customAwards = new CustomAwardsSection(() => this.deps.world().customAwards);
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
   private category: DeedDisplayCategory | 'titles' = 'progression';
@@ -191,6 +199,7 @@ export class DeedsWindow {
     this.lastSig = '';
     this.fetchRarity();
     this.fetchRecent();
+    this.customAwards.refresh();
     this.render();
     this.deps.root().style.display = 'flex';
     // A jump-to-deed open already put the reading position on the landed card
@@ -384,6 +393,7 @@ export class DeedsWindow {
       this.filterBarHtml();
 
     this.wire(el);
+    this.customAwards.mount(el.querySelector(`.${CUSTOM_AWARDS_SLOT_CLASS}`));
     const scroll = el.querySelector('.deeds-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
     if (searchFocus) {
@@ -724,7 +734,8 @@ export class DeedsWindow {
         label: (id) => (id === null ? t('hudChrome.deeds.bordersNone') : deedName(id)),
         decorate: (id, label) => this.borderOptionInner(id, label),
       }) +
-      `<div class="deeds-border-preview-slot">${this.borderPreviewHtml(activeBorder)}</div>`
+      `<div class="deeds-border-preview-slot">${this.borderPreviewHtml(activeBorder)}</div>` +
+      CUSTOM_AWARDS_SLOT_HTML
     );
   }
 

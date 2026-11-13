@@ -610,6 +610,8 @@ export const IWORLD_MEMBERS = [
   { name: 'deedsRarity', kind: 'method' },
   { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
+  // private-realm player-awarded achievements (null offline)
+  { name: 'customAwards', kind: 'data' },
   // --- The Reliquary (IWorldReliquary): sparse firstFind / marks / recent +
   // pure completion helpers (item ownership still rides deedStats) ---
   { name: 'reliquaryFirstFind', kind: 'data' },
@@ -1030,9 +1032,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 453/134/319.
     // Riding ranks (PR 4390) add one method over the release: 466/140/329.
     // The portrait menu's unappliedDungeonDifficulty (method, PR 4625) adds one
-    // more: 471/140/331.
-    expect(IWORLD_MEMBERS.length).toBe(471);
-    expect(DATA_MEMBERS.length).toBe(140);
+    // more: 471/140/331. The private realm's customAwards (data) makes 472/141/331.
+    expect(IWORLD_MEMBERS.length).toBe(472);
+    expect(DATA_MEMBERS.length).toBe(141);
     expect(METHOD_MEMBERS.length).toBe(331);
   });
   it('has no duplicate member names', () => {
@@ -1156,6 +1158,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'craftSkills',
       'craftVaultStock',
       'craftingIdentity',
+      'customAwards',
       'dailyRewardHistory',
       'dailyRewardLeaderboard',
       'dailyRewards',
@@ -1564,6 +1567,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'craftSkills',
       'craftVaultStock',
       'craftingIdentity',
+      'customAwards',
       'deedStats',
       'deedsEarned',
       'delveDaily',
@@ -2673,6 +2677,7 @@ const FACET_DEEDS = [
   'deedsRarity',
   'deedsRecent',
   'deedsLeaderboard',
+  'customAwards',
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
 
@@ -2887,8 +2892,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic, the riding
     // ranks method (PR 4390) and unappliedDungeonDifficulty (PR 4625).
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(471);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(471);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(472);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(472);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -1305,6 +1305,38 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // The private realm's player-awarded achievements (server/custom_awards_routes.ts):
+  // the recipient's list and its hide/reject controls, ownership checked in-handler.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/custom-awards',
+    handler: 'server/custom_awards_routes.ts listHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/custom-awards/hide',
+    handler: 'server/custom_awards_routes.ts hideHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/custom-awards/reject',
+    handler: 'server/custom_awards_routes.ts rejectHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
   // the deeds broadcasts pair's shape exactly (read-tier GET, full-scope POST).
   {

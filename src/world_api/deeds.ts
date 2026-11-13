@@ -60,7 +60,36 @@ export interface DeedsLeaderboardSelf {
   renown?: number;
 }
 
+// One player-awarded achievement on a private realm (server/custom_awards.ts),
+// owned by the SELF character. Every string except the id and timestamp is
+// player-authored text: consumers render it as text, never as markup.
+export interface CustomAwardView {
+  id: number;
+  title: string;
+  description: string;
+  giverName: string;
+  hidden: boolean;
+  // Epoch milliseconds.
+  createdAt: number;
+}
+
+// The self character's player-awarded achievements and the recipient's two
+// controls. The server owns every rule (ownership, private-realm gate).
+export interface CustomAwardsSource {
+  // Newest first, hidden ones included (flagged); null on any failure.
+  list(): Promise<readonly CustomAwardView[] | null>;
+  // Hide from (or show again on) the recipient's own Book; true on success.
+  setHidden(awardId: number, hidden: boolean): Promise<boolean>;
+  // Turn the award down for good: it leaves the Book and cannot be re-awarded.
+  reject(awardId: number): Promise<boolean>;
+}
+
 export interface IWorldDeeds {
+  // The private-realm player-awarded achievements, or null where the host has
+  // none: the offline Sim is always null; the online ClientWorld serves the
+  // REST surface (/api/custom-awards), which answers an empty list when the
+  // realm is not private.
+  readonly customAwards: CustomAwardsSource | null;
   // Deed id -> the utcDay it was earned ('YYYY-MM-DD', '' when the host set
   // no calendar), for the SELF player. Readonly across the seam: consumers
   // never mutate deed state.

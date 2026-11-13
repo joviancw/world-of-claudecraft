@@ -217,6 +217,7 @@ import {
 import { applySelfCombatScalars } from './combat_scalar_wire';
 import { craftResultViewFromEvent } from './craft_result_mirror';
 import { decodeMobileStationCrafts, EMPTY_MST_CRAFTS } from './crafting_wire';
+import { customAwardsClient } from './custom_awards_client';
 import {
   type DesktopWalletBrowserAction,
   type DesktopWalletStatus,
@@ -1616,6 +1617,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // resolves, and also whenever NATIVE_APP is false.
   private nativeLifecycleHandle: PluginListenerHandle | undefined;
   readonly characterId: number;
+  readonly customAwards = customAwardsClient(() => ({
+    base: this.base,
+    token: this.token,
+    characterId: this.characterId,
+  }));
 
   // assigned by openSocket() from the ctor, and reassigned on every reconnect
   private ws!: WebSocket;

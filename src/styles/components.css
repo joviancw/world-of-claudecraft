@@ -11711,6 +11711,39 @@
     color: var(--gold-dim);
     padding: 6px 2px 2px;
   }
+  /* Private-realm player-awarded achievements (custom_awards_section.ts):
+     one plate per award under the cosmetic pickers. */
+  .deed-custom-award {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 9px;
+    border-radius: 4px;
+    border: 1px solid #4a3d26;
+    background: linear-gradient(160deg, #17130c, #0c0a07);
+    overflow-wrap: anywhere;
+  }
+  .deed-custom-award.is-hidden {
+    opacity: 0.6;
+  }
+  .deed-custom-award-title {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .deed-custom-award-desc {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .deed-custom-award-by {
+    font-size: 11px;
+    color: var(--gold-dim);
+  }
+  .deed-custom-award-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
   /* Not adopted onto .ui-btn: deed_border_accent.test.ts pins this recipe by
      literal (it is the one place the border-accent palette is allowed to live),
      so the picker option keeps its shipped plate. */

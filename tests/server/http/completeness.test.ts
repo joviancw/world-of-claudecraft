@@ -113,6 +113,9 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/world-quests/leaderboard',
   '/api/reliquary/rarity',
   '/api/deeds/broadcasts',
+  '/api/custom-awards',
+  '/api/custom-awards/hide',
+  '/api/custom-awards/reject',
   '/api/discord/queue-pings',
   '/api/characters/:id/deeds-recent',
   '/api/characters/:id/appearance-reroll',
@@ -358,6 +361,11 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/world-quests/leaderboard' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
+    // The private realm's player-awarded achievements
+    // (server/custom_awards_routes.ts): registry-only like the deeds family.
+    { method: 'GET', path: '/api/custom-awards' },
+    { method: 'POST', path: '/api/custom-awards/hide' },
+    { method: 'POST', path: '/api/custom-awards/reject' },
     // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
     // registry-only on the deeds broadcasts shape.
     { method: 'GET', path: '/api/discord/queue-pings' },

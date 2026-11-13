@@ -371,6 +371,8 @@ export type {
   DailyRewardTaskView,
 } from './world_api/daily_rewards';
 export type {
+  CustomAwardsSource,
+  CustomAwardView,
   DeedsLeaderboardEntry,
   DeedsLeaderboardSelf,
   DeedsRarity,

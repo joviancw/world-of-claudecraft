@@ -4774,10 +4774,8 @@ export class Sim {
     if (!page) return undefined;
     return clearCountForSource(this.primary, page.clearSource);
   }
-  // Offline the sandbox has no population, so there is no relic rarity to
-  // report: always null (the facet's documented no-data value; the window
-  // omits every rarity line). Deterministic, no fetch, no clock (the
-  // deedsRarity stub doctrine below).
+  // Offline the sandbox has no population: no relic rarity, always null (the
+  // window omits every rarity line; the deedsRarity stub doctrine below).
   reliquaryRarity(): Promise<import('../world_api').ReliquaryRarity | null> {
     return Promise.resolve(null);
   }
@@ -4795,6 +4793,8 @@ export class Sim {
     const ids = [...this.primary.deedsEarned.keys()];
     return Promise.resolve(ids.slice(-deedsMod.DEEDS_RECENT_CAP).reverse());
   }
+  // Player-awarded achievements are a private-realm SERVER feature: none offline.
+  readonly customAwards: import('../world_api').CustomAwardsSource | null = null;
   raidLockouts(): import('../world_api').RaidLockout[] {
     const now = this.lockoutNowMs();
     const out: import('../world_api').RaidLockout[] = [];

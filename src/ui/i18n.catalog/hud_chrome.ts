@@ -439,6 +439,20 @@ export const hudChromeStrings = {
     titleTooLong: 'Achievement titles are limited to {max} characters.',
     descriptionTooLong: 'Achievement descriptions are limited to {max} characters.',
     dailyCap: 'You can award at most {cap} achievements per day.',
+    // The Book of Deeds section listing the self character's awards
+    // (custom_awards_section.ts). {title} and {name} are player text.
+    sectionTitle: 'Awarded by Friends',
+    empty: 'No awards yet. A friend can give you one with /award.',
+    givenBy: 'Awarded by {name} on {date}',
+    hiddenTitle: '{title} (hidden)',
+    hide: 'Hide',
+    show: 'Show',
+    reject: 'Reject',
+    confirmReject: 'Click again to reject',
+    hideAria: 'Hide the award {title}',
+    showAria: 'Show the award {title}',
+    rejectAria: 'Reject the award {title} for good',
+    actionFailed: 'That change could not be saved. Try again later.',
   },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.

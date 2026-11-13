@@ -1078,7 +1078,19 @@ export const pt_BR: EnTranslations = {
       "failed": "The achievement could not be saved. Try again later.",
       "titleTooLong": "Achievement titles are limited to {max} characters.",
       "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
-      "dailyCap": "You can award at most {cap} achievements per day."
+      "dailyCap": "You can award at most {cap} achievements per day.",
+      "sectionTitle": "Awarded by Friends",
+      "empty": "No awards yet. A friend can give you one with /award.",
+      "givenBy": "Awarded by {name} on {date}",
+      "hiddenTitle": "{title} (hidden)",
+      "hide": "Hide",
+      "show": "Show",
+      "reject": "Reject",
+      "confirmReject": "Click again to reject",
+      "hideAria": "Hide the award {title}",
+      "showAria": "Show the award {title}",
+      "rejectAria": "Reject the award {title} for good",
+      "actionFailed": "That change could not be saved. Try again later."
     },
     "readyCheck": {
       "title": "Verificação pronta",
