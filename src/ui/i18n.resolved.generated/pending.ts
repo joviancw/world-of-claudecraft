@@ -27,13 +27,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "es_ES": [
     "hud.system.customAwardBanner",
@@ -53,13 +57,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "fr_FR": [
     "hud.system.customAwardBanner",
@@ -79,13 +87,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "fr_CA": [
     "hud.system.customAwardBanner",
@@ -105,13 +117,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -132,13 +148,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "de_DE": [
     "hud.system.customAwardBanner",
@@ -158,13 +178,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -188,13 +212,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -215,13 +243,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "nl_NL": [
     "hud.system.customAwardBanner",
@@ -241,13 +273,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "pl_PL": [
     "hud.system.customAwardBanner",
@@ -267,13 +303,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "id_ID": [
     "hud.system.customAwardBanner",
@@ -293,13 +333,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "tr_TR": [
     "hud.system.customAwardBanner",
@@ -319,13 +363,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "sv_SE": [
     "hud.system.customAwardBanner",
@@ -345,13 +393,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "vi_VN": [
     "hud.system.customAwardBanner",
@@ -371,13 +423,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ],
   "da_DK": [
     "hud.system.customAwardBanner",
@@ -397,12 +453,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.customAward.offensive",
     "hudChrome.customAward.reject",
     "hudChrome.customAward.rejectAria",
+    "hudChrome.customAward.removeTitle",
+    "hudChrome.customAward.removeTitleAria",
     "hudChrome.customAward.sectionTitle",
     "hudChrome.customAward.self",
     "hudChrome.customAward.sent",
     "hudChrome.customAward.show",
     "hudChrome.customAward.showAria",
     "hudChrome.customAward.titleTooLong",
-    "hudChrome.customAward.usage"
+    "hudChrome.customAward.usage",
+    "hudChrome.customAward.wearTitle",
+    "hudChrome.customAward.wearTitleAria"
   ]
 };

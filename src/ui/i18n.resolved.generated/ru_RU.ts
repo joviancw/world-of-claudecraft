@@ -1090,6 +1090,10 @@ export const ru_RU: EnTranslations = {
       "hideAria": "Скрыть награду {title}",
       "showAria": "Показать награду {title}",
       "rejectAria": "Навсегда отклонить награду {title}",
+      "wearTitle": "Сделать званием",
+      "removeTitle": "Снять звание",
+      "wearTitleAria": "Сделать {title} своим званием",
+      "removeTitleAria": "Перестать носить звание {title}",
       "actionFailed": "Не удалось сохранить изменение. Повторите попытку позже."
     },
     "readyCheck": {

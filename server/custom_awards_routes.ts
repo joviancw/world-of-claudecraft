@@ -8,6 +8,7 @@
 // writes 404, so a stock realm exposes nothing.
 
 import type { Pool } from 'pg';
+import { customAwardChanged } from './custom_award_changes';
 import { type CustomAwardsStore, customAwardsStore } from './custom_awards_db';
 import { ctxAccountId } from './http/context';
 import { withBody } from './http/middleware/body';
@@ -97,8 +98,9 @@ async function hideHandler(ctx: Ctx): Promise<void> {
   const characterId = await ownedCharacterId(ctx, rt, body.character);
   if (characterId === null) return;
   const ok = await rt.store.setHidden(characterId, awardId, body.hidden);
-  if (!ok) json(ctx.res, 404, NOT_FOUND);
-  else json(ctx.res, 200, { ok: true });
+  if (!ok) return json(ctx.res, 404, NOT_FOUND);
+  customAwardChanged(characterId);
+  json(ctx.res, 200, { ok: true });
 }
 
 /** POST /api/custom-awards/reject { character, award }: permanent. */
@@ -117,8 +119,9 @@ async function rejectHandler(ctx: Ctx): Promise<void> {
   const characterId = await ownedCharacterId(ctx, rt, body.character);
   if (characterId === null) return;
   const ok = await rt.store.reject(characterId, awardId);
-  if (!ok) json(ctx.res, 404, NOT_FOUND);
-  else json(ctx.res, 200, { ok: true });
+  if (!ok) return json(ctx.res, 404, NOT_FOUND);
+  customAwardChanged(characterId);
+  json(ctx.res, 200, { ok: true });
 }
 
 const readAccount = requireAccount({ scope: 'read' });

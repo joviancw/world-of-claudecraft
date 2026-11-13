@@ -1090,6 +1090,10 @@ export const ja_JP: EnTranslations = {
       "hideAria": "実績 {title} を非表示にする",
       "showAria": "実績 {title} を表示する",
       "rejectAria": "実績 {title} を完全に辞退する",
+      "wearTitle": "称号にする",
+      "removeTitle": "称号を外す",
+      "wearTitleAria": "{title} を称号にする",
+      "removeTitleAria": "称号 {title} を外す",
       "actionFailed": "その変更を保存できませんでした。後でもう一度お試しください。"
     },
     "readyCheck": {

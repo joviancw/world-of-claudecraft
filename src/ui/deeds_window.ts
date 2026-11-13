@@ -144,7 +144,10 @@ export class DeedsWindow {
   private opened = false;
   // The private realm's player-awarded achievements, painted into a slot on
   // the titles shelf after every rebuild (custom_awards_section.ts).
-  private readonly customAwards = new CustomAwardsSection(() => this.deps.world().customAwards);
+  private readonly customAwards = new CustomAwardsSection(
+    () => this.deps.world().customAwards,
+    () => this.deps.world(),
+  );
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
   private category: DeedDisplayCategory | 'titles' = 'progression';

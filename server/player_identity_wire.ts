@@ -23,7 +23,12 @@ export function writePlayerIdentityWire(e: Entity, out: Record<string, unknown>)
   if (e.guild) out.gd = e.guild;
   if (e.pledgeGuild) out.pg = e.pledgeGuild; // guild pledge (display only; '' for members)
   if (e.guildTier) out.gt = e.guildTier; // guild colour tier (sim/guild_tier.ts)
-  if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
+  if (e.title) {
+    out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
+    // A player-awarded title (custom:<id>) has no catalog text, so its text rides along.
+    const custom = e.customTitles?.get(e.title);
+    if (custom !== undefined) out.ttx = custom;
+  }
   if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.referralInviterName) out.ran = e.referralInviterName; // bounded display name; account IDs stay host-only
   if (e.membershipActive) out.mba = true; // active adaptive armour, no billing details

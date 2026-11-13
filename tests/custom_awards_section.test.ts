@@ -14,6 +14,7 @@ import {
   applyCustomAwardRejected,
   customAwardsSectionModel,
 } from '../src/ui/custom_awards_view';
+import { deedTitleText } from '../src/ui/deed_i18n';
 import { t } from '../src/ui/i18n';
 import type { CustomAwardsSource, CustomAwardView } from '../src/world_api/deeds';
 
@@ -142,6 +143,34 @@ describe('CustomAwardsSection painter', () => {
       false,
     );
     expect(slot.textContent).toContain(t('hudChrome.customAward.actionFailed'));
+  });
+
+  it('wears a shown award as the title and takes it off again', async () => {
+    const worn: (string | null)[] = [];
+    const host = {
+      activeTitle: null as string | null,
+      setActiveTitle: (id: string | null) => worn.push(id),
+    };
+    document.body.innerHTML = CUSTOM_AWARDS_SLOT_HTML;
+    const slot = document.body.firstElementChild as Element;
+    const section = new CustomAwardsSection(
+      () => stubSource([a(1, 1), a(2, 2, true)]).source,
+      () => host,
+    );
+    section.mount(slot);
+    section.refresh();
+    await flush();
+    expect(deedTitleText('custom:1')).toBe('Award 1');
+    const wear = buttons(slot, 1)[0];
+    expect(wear.textContent).toBe(t('hudChrome.customAward.wearTitle'));
+    wear.click();
+    expect(worn).toEqual(['custom:1']);
+    const remove = buttons(slot, 1)[0];
+    expect(remove.textContent).toBe(t('hudChrome.customAward.removeTitle'));
+    remove.click();
+    expect(worn).toEqual(['custom:1', null]);
+    const hiddenLabels = buttons(slot, 2).map((b) => b.textContent);
+    expect(hiddenLabels).not.toContain(t('hudChrome.customAward.wearTitle'));
   });
 
   it('repaints the kept list into a fresh slot after a window rebuild', async () => {

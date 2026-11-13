@@ -2,6 +2,7 @@
 // private realm's player-awarded achievements, IWorldDeeds.customAwards).
 // DOM-free so a Vitest drives it directly; custom_awards_section.ts paints it.
 
+import { customTitleId } from '../sim/custom_titles';
 import type { CustomAwardView } from '../world_api/deeds';
 
 export interface CustomAwardRowModel {
@@ -13,6 +14,8 @@ export interface CustomAwardRowModel {
   hidden: boolean;
   // The first Reject press arms this row; only a second press rejects.
   confirmingReject: boolean;
+  // This award is the worn title (src/sim/custom_titles.ts id).
+  worn: boolean;
 }
 
 export type CustomAwardsSectionModel =
@@ -26,12 +29,17 @@ export type CustomAwardsSectionModel =
 export function customAwardsSectionModel(
   list: readonly CustomAwardView[] | null,
   confirmingId: number | null,
+  wornTitle: string | null = null,
 ): CustomAwardsSectionModel {
   if (list === null) return { state: 'absent' };
   if (list.length === 0) return { state: 'empty' };
   const rows = [...list]
     .sort((a, b) => Number(a.hidden) - Number(b.hidden) || b.createdAt - a.createdAt || b.id - a.id)
-    .map((a) => ({ ...a, confirmingReject: a.id === confirmingId }));
+    .map((a) => ({
+      ...a,
+      confirmingReject: a.id === confirmingId,
+      worn: !a.hidden && customTitleId(a.id) === wornTitle,
+    }));
   return { state: 'rows', rows };
 }
 

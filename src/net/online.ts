@@ -104,6 +104,7 @@ import {
 } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 import { WORLD_SEED } from '../sim/world_seed';
+import { rememberCustomTitleText } from '../ui/custom_title_text';
 import {
   type AccountCosmetics,
   type ActiveConsecration,
@@ -2700,7 +2701,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.vaultRarity = ['common', 'rare', 'epic', 'legendary'].includes(w.vr) ? w.vr : undefined;
         e.objectItemId = w.obj ?? null;
-        Object.assign(e, decodePlayerIdentityWire(w)); // guild, pledge, tier, deed title/border, spec
+        const identity = decodePlayerIdentityWire(w); // guild, pledge, tier, deed title/border, spec
+        Object.assign(e, identity);
+        if (identity.title) rememberCustomTitleText(identity.title, identity.titleText);
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];

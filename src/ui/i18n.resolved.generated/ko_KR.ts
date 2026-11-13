@@ -1090,6 +1090,10 @@ export const ko_KR: EnTranslations = {
       "hideAria": "{title} 업적 숨기기",
       "showAria": "{title} 업적 보이기",
       "rejectAria": "{title} 업적을 영구히 거절",
+      "wearTitle": "칭호로 사용",
+      "removeTitle": "칭호 해제",
+      "wearTitleAria": "{title}을(를) 칭호로 사용",
+      "removeTitleAria": "{title} 칭호 사용 중지",
       "actionFailed": "변경 사항을 저장하지 못했습니다. 나중에 다시 시도하세요."
     },
     "readyCheck": {

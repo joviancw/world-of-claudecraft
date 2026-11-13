@@ -2,8 +2,10 @@
 // rebuilds its markup wholesale, so it leaves an empty slot and calls mount()
 // after every rebuild; this painter keeps the fetched list and repaints into
 // whichever slot is current. Every award string is player-authored, so it is
-// written through textContent only, never markup.
+// written through textContent only, never markup. A shown award can also be
+// worn as the title (`custom:<id>`); the server validates ownership.
 
+import { customTitleId } from '../sim/custom_titles';
 import type { CustomAwardsSource, CustomAwardView } from '../world_api/deeds';
 import {
   applyCustomAwardHidden,
@@ -11,10 +13,18 @@ import {
   type CustomAwardRowModel,
   customAwardsSectionModel,
 } from './custom_awards_view';
+import { rememberCustomTitleText } from './custom_title_text';
 import { formatDateTime, t } from './i18n';
 
 export const CUSTOM_AWARDS_SLOT_CLASS = 'deeds-custom-awards';
 export const CUSTOM_AWARDS_SLOT_HTML = `<div class="${CUSTOM_AWARDS_SLOT_CLASS}"></div>`;
+
+/** The worn-title half of the deeds facet (IWorldDeeds activeTitle and
+ *  setActiveTitle). */
+export interface CustomAwardTitleHost {
+  readonly activeTitle: string | null;
+  setActiveTitle(id: string | null): void;
+}
 
 export class CustomAwardsSection {
   private list: readonly CustomAwardView[] | null = null;
@@ -22,8 +32,14 @@ export class CustomAwardsSection {
   private slot: Element | null = null;
   private fetchSeq = 0;
   private failed = false;
+  // The title just picked here, shown until the next refresh so the button
+  // flips at once instead of waiting for the server echo.
+  private pendingWorn: string | null | undefined = undefined;
 
-  constructor(private readonly source: () => CustomAwardsSource | null) {}
+  constructor(
+    private readonly source: () => CustomAwardsSource | null,
+    private readonly titles: () => CustomAwardTitleHost | null = () => null,
+  ) {}
 
   /** One fetch per window open; a stale answer after a reopen is dropped. */
   refresh(): void {
@@ -32,12 +48,14 @@ export class CustomAwardsSection {
     this.list = null;
     this.confirmingId = null;
     this.failed = false;
+    this.pendingWorn = undefined;
     this.paint();
     if (!src) return;
     void src
       .list()
       .then((list) => {
         if (seq !== this.fetchSeq) return;
+        for (const a of list ?? []) rememberCustomTitleText(customTitleId(a.id), a.title);
         this.list = list;
         this.paint();
       })
@@ -55,7 +73,9 @@ export class CustomAwardsSection {
     const slot = this.slot;
     if (!slot || !slot.isConnected) return;
     slot.replaceChildren();
-    const model = customAwardsSectionModel(this.list, this.confirmingId);
+    const worn =
+      this.pendingWorn !== undefined ? this.pendingWorn : (this.titles()?.activeTitle ?? null);
+    const model = customAwardsSectionModel(this.list, this.confirmingId, worn);
     if (model.state === 'absent') return;
     const doc = slot.ownerDocument;
     const group = doc.createElement('div');
@@ -110,6 +130,21 @@ export class CustomAwardsSection {
     el.append(by);
     const actions = doc.createElement('div');
     actions.className = 'deed-custom-award-actions';
+    const host = this.titles();
+    if (host && !row.hidden) {
+      const id = customTitleId(row.id);
+      actions.append(
+        this.button(
+          doc,
+          row.worn ? 'hudChrome.customAward.removeTitle' : 'hudChrome.customAward.wearTitle',
+          row.worn
+            ? 'hudChrome.customAward.removeTitleAria'
+            : 'hudChrome.customAward.wearTitleAria',
+          row.title,
+          () => this.wear(host, row.worn ? null : id),
+        ),
+      );
+    }
     actions.append(
       this.button(
         doc,
@@ -146,6 +181,12 @@ export class CustomAwardsSection {
     b.setAttribute('aria-label', t(ariaKey, { title }));
     b.addEventListener('click', onClick);
     return b;
+  }
+
+  private wear(host: CustomAwardTitleHost, id: string | null): void {
+    host.setActiveTitle(id);
+    this.pendingWorn = id;
+    this.paint();
   }
 
   private setHidden(id: number, hidden: boolean): void {

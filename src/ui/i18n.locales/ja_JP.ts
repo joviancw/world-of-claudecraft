@@ -25733,4 +25733,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.customAward.actionFailed':
     'その変更を保存できませんでした。後でもう一度お試しください。',
   'hud.system.customAwardBanner': '実績解除！',
+  'hudChrome.customAward.wearTitle': '称号にする',
+  'hudChrome.customAward.removeTitle': '称号を外す',
+  'hudChrome.customAward.wearTitleAria': '{title} を称号にする',
+  'hudChrome.customAward.removeTitleAria': '称号 {title} を外す',
 };

@@ -1090,6 +1090,10 @@ export const en_XA: EnTranslations = {
       "hideAria": "[Ĥíðé ţĥé áŵáŕð {title}]",
       "showAria": "[Šĥóŵ ţĥé áŵáŕð {title}]",
       "rejectAria": "[Ŕéĵéçţ ţĥé áŵáŕð {title} ƒóŕ ĝóóð]",
+      "wearTitle": "[Ŵéáŕ áš ţíţļé]",
+      "removeTitle": "[Ŕéɱóʋé ţíţļé]",
+      "wearTitleAria": "[Ŵéáŕ {title} áš ýóúŕ ţíţļé]",
+      "removeTitleAria": "[Šţóþ ŵéáŕíñĝ {title} áš ýóúŕ ţíţļé]",
       "actionFailed": "[Ţĥáţ çĥáñĝé çóúļð ñóţ ƀé šáʋéð. Ţŕý áĝáíñ ļáţéŕ.]"
     },
     "readyCheck": {

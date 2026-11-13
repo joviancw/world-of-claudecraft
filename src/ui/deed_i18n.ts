@@ -8,7 +8,9 @@
 // English (clean English is preferable to a broken guess).
 
 import { DEEDS } from '../sim/content/deeds';
+import { isCustomTitleId } from '../sim/custom_titles';
 import { devBadgeTitleTier } from '../sim/dev_badge_titles';
+import { customTitleText } from './custom_title_text';
 import { devTierByIndex, devTierDisplayName } from './dev_tier';
 import { getLanguage, type SupportedLanguage, t } from './i18n';
 import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
@@ -199,6 +201,7 @@ export function deedDesc(id: string): string {
  *  inspect, chat, social, boards, player card, picker) resolves through here. */
 export function deedTitleText(id: string): string {
   if (id === 'referral_trailmate') return t('referralCards.trailmateTitle');
+  if (isCustomTitleId(id)) return customTitleText(id);
   const rung = devBadgeTitleTier(id);
   if (rung) {
     const tier = devTierByIndex(rung.index);

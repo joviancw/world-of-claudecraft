@@ -1090,6 +1090,10 @@ export const da_DK: EnTranslations = {
       "hideAria": "Hide the award {title}",
       "showAria": "Show the award {title}",
       "rejectAria": "Reject the award {title} for good",
+      "wearTitle": "Wear as title",
+      "removeTitle": "Remove title",
+      "wearTitleAria": "Wear {title} as your title",
+      "removeTitleAria": "Stop wearing {title} as your title",
       "actionFailed": "That change could not be saved. Try again later."
     },
     "readyCheck": {

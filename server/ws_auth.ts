@@ -638,6 +638,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // resume never re-reads the queue. Fire-and-forget; the drain owns
             // its own logging and never fails the handshake.
             if (!('error' in result)) void game.drainBuddyGrants(result);
+            // Private realm: install the wearable player-awarded titles
+            // (server/custom_award_titles.ts); a no-op elsewhere.
+            if (!('error' in result)) game.customAwards?.syncTitles(admittedCharacter.id);
           } finally {
             // Decrement on every fresh-arm exit path (join completed, lease refused,
             // or a thrown DB error): a successful join is now counted by

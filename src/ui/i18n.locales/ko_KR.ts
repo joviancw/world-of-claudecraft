@@ -25734,4 +25734,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.customAward.rejectAria': '{title} 업적을 영구히 거절',
   'hudChrome.customAward.actionFailed': '변경 사항을 저장하지 못했습니다. 나중에 다시 시도하세요.',
   'hud.system.customAwardBanner': '업적 달성!',
+  'hudChrome.customAward.wearTitle': '칭호로 사용',
+  'hudChrome.customAward.removeTitle': '칭호 해제',
+  'hudChrome.customAward.wearTitleAria': '{title}을(를) 칭호로 사용',
+  'hudChrome.customAward.removeTitleAria': '{title} 칭호 사용 중지',
 };

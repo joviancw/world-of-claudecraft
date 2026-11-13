@@ -36,6 +36,7 @@ import { THATCHGRIN_ID } from './content/gourdlight_eve_scarecrow';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { REFERRAL_TITLE } from './content/referral_rewards';
 import { pointsSpent } from './content/talents';
+import { isCustomTitleId } from './custom_titles';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { onKillForGuildContracts } from './guild_contracts';
@@ -876,6 +877,16 @@ export function setActiveTitle(
       if (!opts?.restore && !canWearDevBadgeTitle(deedId, e.devTier)) return;
       meta.activeTitle = deedId;
       e.title = deedId;
+      return;
+    }
+    // A player-awarded title (src/sim/custom_titles.ts). On restore the id is
+    // held on meta only, off the nameplate, until the server installs the
+    // owned list and applyCustomTitles confirms or clears it.
+    if (isCustomTitleId(deedId)) {
+      const owned = e.customTitles?.has(deedId) === true;
+      if (!owned && !opts?.restore) return;
+      meta.activeTitle = deedId;
+      e.title = owned ? deedId : null;
       return;
     }
     // Account-wide: a deed earned by ANY character on the account unlocks its

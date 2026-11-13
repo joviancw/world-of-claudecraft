@@ -50,7 +50,7 @@ describe('player identity wire', () => {
   });
   it('ships no bytes for an unguilded, untitled, unspecced player', () => {
     expect(encode(NONE)).toEqual({});
-    expect(decodePlayerIdentityWire({})).toEqual(NONE);
+    expect(decodePlayerIdentityWire({})).toEqual({ ...NONE, titleText: '' });
   });
 
   it('keeps the terse keys the older clients already read, plus spc for the spec', () => {
@@ -87,9 +87,20 @@ describe('player identity wire', () => {
       specId: 'restoration',
       membershipActive: true,
     };
-    expect(decodePlayerIdentityWire(encode(full))).toEqual(full);
+    expect(decodePlayerIdentityWire(encode(full))).toEqual({ ...full, titleText: '' });
     const pledged: IdentitySlice = { ...NONE, pledgeGuild: 'Dawnwardens', guildTier: 1 };
-    expect(decodePlayerIdentityWire(encode(pledged))).toEqual(pledged);
+    expect(decodePlayerIdentityWire(encode(pledged))).toEqual({ ...pledged, titleText: '' });
+  });
+
+  it('ships a player-awarded title with its text, the one title no catalog resolves', () => {
+    const custom = {
+      ...NONE,
+      title: 'custom:7',
+      customTitles: new Map([['custom:7', 'Pull Champion']]),
+    };
+    expect(encode(custom)).toEqual({ title: 'custom:7', ttx: 'Pull Champion' });
+    expect(decodePlayerIdentityWire(encode(custom)).titleText).toBe('Pull Champion');
+    expect(encode({ ...custom, title: 'deed_title' })).toEqual({ title: 'deed_title' });
   });
 
   it('resets a cleared spec: a respec to none drops the key and the decode reads null', () => {

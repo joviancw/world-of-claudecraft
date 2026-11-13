@@ -26188,4 +26188,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.customAward.rejectAria': 'Навсегда отклонить награду {title}',
   'hudChrome.customAward.actionFailed': 'Не удалось сохранить изменение. Повторите попытку позже.',
   'hud.system.customAwardBanner': 'Достижение получено!',
+  'hudChrome.customAward.wearTitle': 'Сделать званием',
+  'hudChrome.customAward.removeTitle': 'Снять звание',
+  'hudChrome.customAward.wearTitleAria': 'Сделать {title} своим званием',
+  'hudChrome.customAward.removeTitleAria': 'Перестать носить звание {title}',
 };

@@ -7618,6 +7618,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
   // rides the identity wire only when non-null.
   title?: string | null;
+  // Private realm only: this player's wearable player-awarded titles,
+  // `custom:<awardId>` to text, installed by the server
+  // (src/sim/custom_titles.ts applyCustomTitles). Absent everywhere else.
+  customTitles?: ReadonlyMap<string, string>;
   // Book of Deeds nameplate border: a deed id (never a slug, never display
   // text), null/absent for borderless players and every mob/npc. Written by
   // the sim border setter (src/sim/deeds.ts setActiveBorder) and player spawn

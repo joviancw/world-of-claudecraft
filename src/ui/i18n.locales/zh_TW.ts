@@ -24419,4 +24419,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.customAward.rejectAria': '永久拒絕成就 {title}',
   'hudChrome.customAward.actionFailed': '該變更未能儲存，請稍後再試。',
   'hud.system.customAwardBanner': '成就解鎖！',
+  'hudChrome.customAward.wearTitle': '設為頭銜',
+  'hudChrome.customAward.removeTitle': '取消頭銜',
+  'hudChrome.customAward.wearTitleAria': '將 {title} 設為你的頭銜',
+  'hudChrome.customAward.removeTitleAria': '不再使用 {title} 作為你的頭銜',
 };

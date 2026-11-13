@@ -17,6 +17,8 @@ export interface PlayerIdentityWire {
   pledgeGuild: string;
   guildTier: number;
   title: string | null;
+  // The text of a player-awarded (custom:<id>) title; '' for every other title.
+  titleText: string;
   border: string | null;
   specId: string | null;
   membershipActive: boolean;
@@ -34,6 +36,7 @@ export function decodePlayerIdentityWire(w: Record<string, unknown>): PlayerIden
     pledgeGuild: (w.pg as string | undefined) ?? '',
     guildTier: (w.gt as number | undefined) ?? 0,
     title: (w.title as string | null | undefined) ?? null, // Book of Deeds active title (a deed id)
+    titleText: typeof w.ttx === 'string' ? w.ttx : '', // player-awarded title text
     border: (w.border as string | null | undefined) ?? null, // Book of Deeds nameplate border (a deed id)
     specId: typeof w.spc === 'string' && w.spc !== '' ? w.spc : null, // chosen talent spec id
   };

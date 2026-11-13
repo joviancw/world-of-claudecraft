@@ -602,7 +602,11 @@ function liveGame(): GameServer {
   // max-two pool. The coordinator cap equals that pool exactly, so it creates
   // no pg waiters and leaves every shared-pool client to auth/save work. The
   // constructor default keeps DB-mocked unit worlds independent from config.
-  gameInstance ??= new GameServer(undefined, majorBackgroundDbGate);
+  if (!gameInstance) {
+    const game = new GameServer(undefined, majorBackgroundDbGate);
+    game.customAwards.bindSim(() => game.sim);
+    gameInstance = game;
+  }
   return gameInstance;
 }
 

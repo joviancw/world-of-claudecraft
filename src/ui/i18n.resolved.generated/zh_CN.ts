@@ -1090,6 +1090,10 @@ export const zh_CN: EnTranslations = {
       "hideAria": "隐藏成就 {title}",
       "showAria": "显示成就 {title}",
       "rejectAria": "永久拒绝成就 {title}",
+      "wearTitle": "设为头衔",
+      "removeTitle": "取消头衔",
+      "wearTitleAria": "将 {title} 设为你的头衔",
+      "removeTitleAria": "不再使用 {title} 作为你的头衔",
       "actionFailed": "该更改未能保存，请稍后再试。"
     },
     "readyCheck": {

@@ -12,6 +12,7 @@
 // claimed at all, so a stock realm's chat behaves exactly as before.
 
 import type { Pool } from 'pg';
+import { onCustomAwardChanged } from './custom_award_changes';
 import {
   CUSTOM_AWARD_NOTICES,
   type CustomAwardCommand,
@@ -21,6 +22,7 @@ import {
   draftCustomAward,
   parseCustomAwardCommand,
 } from './custom_award_command';
+import { CustomAwardTitles, type CustomTitleSim } from './custom_award_titles';
 import { type CustomAwardsStore, customAwardsStore } from './custom_awards_db';
 import { logger } from './http/logger';
 import { privateRealmRules } from './private_realm_config';
@@ -45,7 +47,7 @@ export interface CustomAwardBroadcast<S> {
   sendRaw(session: S, payload: string): void;
 }
 
-/** A recipient changed what they own (a new award): M7 hooks titles here. */
+/** A recipient changed what they own (a new award). */
 export type CustomAwardListener = (recipientCharacterId: number) => void;
 
 function logPayload(text: string, color: string): string {
@@ -68,6 +70,29 @@ export class CustomAwards<S extends CustomAwardSession> {
 
   onAwarded(listener: CustomAwardListener): void {
     this.listeners.push(listener);
+  }
+
+  private titles: CustomAwardTitles | null = null;
+
+  /** Turn on the live title sync (server/custom_award_titles.ts). The boot
+   *  wiring calls this once with the game's sim; until then every sync is a
+   *  no-op, so a bare test GameServer needs no database. */
+  bindSim(sim: () => CustomTitleSim): void {
+    if (this.titles) return;
+    this.titles = new CustomAwardTitles(
+      this.store,
+      () => this.rules()?.customAwardsEnabled === true,
+      sim,
+    );
+    this.onAwarded((characterId) => this.syncTitles(characterId));
+    onCustomAwardChanged((characterId) => this.syncTitles(characterId));
+  }
+
+  /** Refresh one character's wearable titles if it is online. Fire and forget. */
+  syncTitles(characterId: number): void {
+    void this.titles?.sync(characterId).catch((err) => {
+      logger.error({ err, characterId }, 'custom title sync failed');
+    });
   }
 
   /** Claim a chat line as /award. False when it is not one (or the realm is
