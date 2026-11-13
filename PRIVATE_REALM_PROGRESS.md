@@ -260,6 +260,10 @@ announces to the realm.
 | 2026-11-12 | `npx vitest run tests/private_realm_dungeons.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts tests/server/private_realm_pace.test.ts tests/server/private_realm_pace_report.test.ts` | 151 passed (before the per-dungeon cases; the dungeons file alone is now 19 passed) |
 | 2026-11-12 | `npx vitest run tests/deploy_private_realm.test.ts tests/deploy_admission_cap.test.ts tests/server/tunables.test.ts tests/ci_change_classify.test.ts` | 141 passed |
 
+| 2026-11-13 | `node scripts/gate_select.mjs` | i18n and manifest freshness, malware scan and changed-file biome passed. The `.env.example` change forced the full 6,278-file suite, stopped after about 3 hours on this laptop (load 15 to 20 with XProtect scans); 39 files had timed out |
+| 2026-11-13 | `npx tsc --noEmit` | pass |
+| 2026-11-13 | the 39 timed-out files re-run (2 workers, then one at a time, `env -u ALLOW_DEV_COMMANDS -u PRIVATE_REALM`) | all pass except one 30 s timeout in `tests/sfx_studio_server_security.test.ts` (file took 985 s); the branch touches no SFX or studio code. Needs a run on a quiet machine or CI |
+
 ## Outstanding
 
 - Human playtest of the boss kills with eight real players.
