@@ -30,7 +30,8 @@ export interface PaceWho {
 export type PaceSample = {
   characterId: number;
   characterName: string | null;
-  level: number;
+  /** Not `level`: that key is the logger's own severity field. */
+  charLevel: number;
   lifetimeXp: number;
   playedSeconds: number;
   questsCompleted: number;
@@ -45,7 +46,7 @@ export function paceSample(
   return {
     characterId: who.characterId,
     characterName: who.name ?? null,
-    level,
+    charLevel: level,
     lifetimeXp: meta.lifetimeXp,
     playedSeconds: Math.round(livePlaytimeSeconds(meta, simTime)),
     questsCompleted: meta.questsDone.size,

@@ -27,7 +27,7 @@ describe('observePrivateRealmPace', () => {
       {
         characterId: 55,
         characterName: 'Frostwhisper',
-        level: 6,
+        charLevel: 6,
         lifetimeXp: 12345,
         playedSeconds: 3900,
         questsCompleted: 3,
