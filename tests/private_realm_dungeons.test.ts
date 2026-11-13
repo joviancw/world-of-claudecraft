@@ -6,17 +6,26 @@
 // normal five-player party is never scaled. Driven through a real Sim and the
 // real enterDungeon door.
 import { describe, expect, it } from 'vitest';
-import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
+import { MOBS } from '../src/sim/data';
+import { enterDungeon, instanceKeyFor, instanceOriginOf } from '../src/sim/instances/dungeons';
 import {
   applyPrivateRealmMobScale,
   claimGroupScale,
 } from '../src/sim/instances/private_realm_scaling';
+import { spawnBossAdds } from '../src/sim/mob/boss_mechanics';
 import { type PrivateRealmRules, resolvePrivateRealmRules } from '../src/sim/private_realm';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { type Entity, xpToReachLevel } from '../src/sim/types';
 
 const DUNGEON = 'hollow_crypt';
 const RAID_DENIED = 'Raid groups cannot enter standard dungeons.';
+const FIVE_PLAYER_DUNGEONS = [
+  'hollow_crypt',
+  'sunken_bastion',
+  'gravewyrm_sanctum',
+  'drowned_temple',
+  'wildheart_basin',
+];
 
 function makeSim(privateRealm: PrivateRealmRules | null): Sim {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, privateRealm });
@@ -142,6 +151,46 @@ describe('eight-player enemy scaling', () => {
     expect(compared).toBeGreaterThan(0);
   });
 
+  // The same spawn placement in a raid claim and a party claim, for every
+  // five-player dungeon: the raid's twin carries exactly the health scale.
+  it.each(
+    FIVE_PLAYER_DUNGEONS.flatMap((d) =>
+      (['normal', 'heroic'] as const).map((m) => [d, m] as const),
+    ),
+  )('scales every placement in %s (%s) by the health multiplier', (dungeon, mode) => {
+    const sim = makeSim(resolvePrivateRealmRules());
+    const raid = group(sim, 'R', 8, true);
+    const party = group(sim, 'P', 5, false);
+    for (const lead of [raid[0], party[0]]) sim.setDungeonDifficulty(mode, lead);
+    for (const pid of [...raid, ...party]) expect(enterDungeon(sim.ctx, dungeon, pid)).toBe(true);
+    sim.tick();
+
+    const claim = (lead: number) =>
+      sim.instances.find(
+        (i) => i.dungeonId === dungeon && i.partyKey === instanceKeyFor(sim.ctx, lead),
+      )!;
+    const placed = (c: InstanceSlot) => {
+      const o = instanceOriginOf(c);
+      return new Map(
+        mobsOf(sim, c).map((m) => [
+          `${m.templateId}:${m.level}:${Math.round(m.pos.x - o.x)}:${Math.round(m.pos.z - o.z)}`,
+          m,
+        ]),
+      );
+    };
+    const partyMobs = placed(claim(party[0]));
+    const off: string[] = [];
+    let compared = 0;
+    for (const [key, mob] of placed(claim(raid[0]))) {
+      const twin = partyMobs.get(key);
+      if (!twin) continue;
+      compared++;
+      if (mob.maxHp !== Math.round(twin.maxHp * 1.5)) off.push(`${key} ${mob.maxHp}/${twin.maxHp}`);
+    }
+    expect(compared).toBeGreaterThan(0);
+    expect(off).toEqual([]);
+  });
+
   it('never stacks the scale on repeated ticks', () => {
     const sim = makeSim(resolvePrivateRealmRules());
     const raid = group(sim, 'R', 8, true);
@@ -161,6 +210,24 @@ describe('eight-player enemy scaling', () => {
     expect(claimGroupScale(sim.ctx, sim.cfg.privateRealm, claim, () => false)).not.toBeNull();
     expect(claimGroupScale(sim.ctx, sim.cfg.privateRealm, claim, () => true)).toBeNull();
     expect(claimGroupScale(sim.ctx, null, claim, () => false)).toBeNull();
+  });
+
+  it('scales boss adds summoned mid-fight on the next tick', () => {
+    const sim = makeSim(resolvePrivateRealmRules());
+    const raid = group(sim, 'R', 8, true);
+    for (const pid of raid) enterDungeon(sim.ctx, DUNGEON, pid);
+    sim.tick();
+    const claim = claimOf(sim, raid[0]);
+    const boss = mobsOf(sim, claim).find((m) => MOBS[m.templateId]?.boss);
+    if (!boss) throw new Error('no boss in the claim');
+    const before = new Set(claim.mobIds);
+    expect(MOBS.shackled_prisoner).toBeDefined();
+    spawnBossAdds(sim.ctx, boss, 'shackled_prisoner', 2);
+    const adds = claim.mobIds.filter((id) => !before.has(id)).map((id) => sim.entities.get(id)!);
+    expect(adds).toHaveLength(2);
+    expect(adds.some((m) => m.privateRealmScaled)).toBe(false);
+    sim.tick();
+    expect(adds.every((m) => m.privateRealmScaled === true)).toBe(true);
   });
 
   it('keeps a mid-fight health fraction when a mob is stamped', () => {

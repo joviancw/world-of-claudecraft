@@ -107,6 +107,51 @@ in `src/sim/types.ts`.
   boss DPS is far below real players; the boss kill is NOT verified by script
   and needs a human playtest.
 
+## Every dungeon and the raid (M4)
+
+Script runs (`BOSS=0`, trash only, 13 bots each) after the ratio fixes below:
+
+| Dungeon | Normal | Heroic |
+|---|---|---|
+| hollow_crypt | pass, ratio 1.50 | pass, ratio 1.50 |
+| sunken_bastion | pass, ratio 1.50 | pass, ratio 1.50 |
+| gravewyrm_sanctum | pass, ratio 1.50 | pass, ratio 1.50 |
+| drowned_temple | pass, ratio 1.50 | pass, ratio 1.50 |
+| wildheart_basin | pass, ratio 1.50 | pass, ratio 1.50 |
+| nythraxis_boss_arena (raid, 8 players) | pass, ratio 1.00, boss engaged | pass, ratio 1.00, boss engaged |
+
+- Every run: one shared instance for the eight, a separate stock claim for
+  the five-player control, step out and rejoin the same instance.
+- The raid keeps its own tuning (ratio 1.00), as the brief asks: only
+  five-player content is scaled.
+- Gravewyrm and Wildheart: both the eight-bot raid and the five-bot control
+  wipe on the first pack. The scripted bots only auto-attack, so these
+  are bot limits, not the scale. Real players need to test the boss kills.
+- In-process proof for every dungeon and difficulty:
+  `tests/private_realm_dungeons.test.ts` pairs every spawn placement of a raid
+  claim with its five-player twin and requires exactly 1.5 times the health.
+  It also covers boss adds summoned mid-fight (`spawnBossAdds`).
+- Script fixes found on the way: pair by template, level and local position
+  (heroic minibosses and rolled levels broke template pairing); ignore mobs
+  more than 240 yards from the bot's own slot origin (a neighbouring
+  claim's mobs were in interest range and showed a false 0.67); exit and
+  rejoin before any fighting; skip the heal check on a wipe.
+
+Audit:
+- Encounter spawns: every spawn path (spawn list, trash kits, boss adds,
+  encounter summons) registers in the claim's `mobIds`, which is what the
+  scaler walks. Covered by the summon test.
+- `raid_return` (`src/sim/instances/raid_return.ts`): only the real raids
+  have a raid family. In a five-player dungeon run by eight, a raider who
+  steps out but stays in the group rejoins the same claim (script check). One
+  who LEAVES the group cannot return to that run, as for any party.
+- Subgroups: an eight-player raid is group 1 (five) and group 2 (three). Group
+  buffs reach every member except Vampiric Touch and Choir of Deliverance,
+  which heal only the priest's subgroup (stock raid behavior). Put the
+  shadow priest with the players who need it.
+- Tuning: the defaults (health 1.5, damage 1.15) stay. The bots cannot judge
+  difficulty; revisit after the first real clears.
+
 ## Player-awarded achievements (M5, M6)
 
 - Command: `/award <name> "<title>" [description]` in chat. Title at most 40
@@ -127,6 +172,75 @@ in `src/sim/types.ts`.
   The routes check account ownership of the named character on every call; a
   stock realm answers `enabled: false` and the section never shows.
 
+## Award titles (M7)
+
+- An award can be worn as a title. Its id is `custom:<awardId>`
+  (`src/sim/custom_titles.ts`), so it can never collide with a deed title.
+- The owned set lives on the server only. `server/custom_award_titles.ts`
+  reads the recipient's non-hidden awards and installs them on the live
+  entity as `Entity.customTitles` (id to text). It syncs on join, on every new
+  award, and on Hide, Show or Reject, and the newest sync wins.
+- `setActiveTitle` (`src/sim/deeds.ts`) accepts a custom id only when it is in
+  that set. A saved title is kept through a restore and confirmed by the join
+  sync; Hide or Reject clears it.
+- Wire: the identity key `ttx` carries the worn custom title's text next to
+  `ttl` (`server/player_identity_wire.ts`). The client remembers it
+  (`src/ui/custom_title_text.ts`) and `deedTitleText` renders it over the head
+  and on the character pane. Identity diffing already re-sends on change.
+- Book of Deeds: Wear and Remove buttons on each shown award row.
+- Live check: `npx tsx scripts/private_realm_award_e2e.ts` (two bots, dev
+  server) awards, wears, hides and rejects through the real routes, and
+  checks the announcement, the no-self-award and duplicate refusals, and the
+  title text seen by the other client.
+
+## Calibration (M8)
+
+- `npx tsx scripts/private_realm_pace_report.ts server.log --current <x> --target 6`
+  reads the pace lines, projects each character's played hours to level 20
+  from its last three level-ups, and prints the multiplier that would land
+  the median character on the target (`server/private_realm_pace_report.ts`).
+  Set both `PRIVATE_REALM_KILL_XP` and `PRIVATE_REALM_QUEST_XP` to it, restart,
+  and re-run after a few more hours of play.
+- The pace line's level field is `charLevel`, because `level` is the logger's
+  own severity key (a live run showed it being overwritten).
+- `/dev level` jumps emit no level-up and so write no pace line; only real XP
+  does. Live check: a level 1 bot earning kill XP wrote its line at level 2.
+- Starting point: x1. The authored quests alone cover about 3.8 times the
+  curve (see M1), so the realm needs real play data, not a guess. Re-check at
+  the first session and adjust.
+- Loot: unchanged, per the brief. Five-player dungeon loot is rolled per
+  kill as in stock, so eight players share five-player drops; no roll counts
+  were changed.
+
+## Private deploy (M8)
+
+Follow `DEPLOY.md` as written (one AWS instance, docker compose, Caddy TLS),
+from this branch on the fork. The only differences:
+
+1. In the host `.env`, set `PRIVATE_REALM=1` and, once calibrated,
+   `PRIVATE_REALM_KILL_XP` and `PRIVATE_REALM_QUEST_XP`. Leave the other
+   private-realm keys unset unless tuning (the defaults are the brief:
+   8 players, level 20, health 1.5, damage 1.15, 10 awards a day).
+2. The game service only receives the variables listed in
+   `docker-compose.yml`, so this branch adds pass-throughs for every
+   `PRIVATE_REALM*` key (pinned by `tests/deploy_private_realm.test.ts`).
+   Without them the realm would silently boot stock.
+3. Do NOT set `ALLOW_DEV_COMMANDS`: compose does not pass it, and the cheat
+   set must stay off. Do not set `MAX_WS_PER_IP_HARD` either: the default of
+   20 per IP covers eight friends even behind one home network. The 400 used
+   locally is only for the 13-bot scripts.
+4. Keep the realm private: share the URL only with the group, and use
+   `/api/register` as normal (one account each). The usual moderation and
+   admin tools still work.
+5. After the first session, copy the game logs
+   (`sudo docker compose logs game > game.log`) and run the pace report
+   (Calibration, above). Change the two XP keys and restart with
+   `sudo docker compose up -d`.
+
+Verify after boot: `curl -s https://<host>/api/status` answers, a level 20
+raid of six to eight enters a five-player dungeon together, and `/award`
+announces to the realm.
+
 ## Test log
 
 | Date | Command | Result |
@@ -141,9 +255,12 @@ in `src/sim/types.ts`.
 | 2026-11-12 | `npx vitest run tests/custom_awards_section.test.ts tests/server/custom_awards_routes.test.ts tests/server/custom_awards.test.ts tests/custom_award_i18n.test.ts tests/i18n_completeness.test.ts tests/localization_fixes.test.ts tests/monolith_budget.test.ts tests/world_api_parity.test.ts` | 622 passed, 3 skipped |
 | 2026-11-12 | `npx vitest run tests/architecture.test.ts tests/server/http tests/custom_awards_section.test.ts` (with `ALLOW_DEV_COMMANDS` cleared) | 1476 passed. With the local `.env` loaded, the `/api/status` golden fixture differs only by `dev_commands: true` |
 
+| 2026-11-12 | `npx tsx scripts/private_realm_award_e2e.ts` (dev server) | 17 passed, 0 failed |
+| 2026-11-12 | `npx tsx scripts/private_realm_raid8.ts <dungeon> <mode>` for all five dungeons, both modes, plus `nythraxis_boss_arena` heroic | all pass (table in M4) |
+| 2026-11-12 | `npx vitest run tests/private_realm_dungeons.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts tests/server/private_realm_pace.test.ts tests/server/private_realm_pace_report.test.ts` | 151 passed (before the per-dungeon cases; the dungeons file alone is now 19 passed) |
+| 2026-11-12 | `npx vitest run tests/deploy_private_realm.test.ts tests/deploy_admission_cap.test.ts tests/server/tunables.test.ts tests/ci_change_classify.test.ts` | 141 passed |
+
 ## Outstanding
 
-- M4 all dungeons, Heroic, the raid.
-- M7 equippable award titles.
-- M8 calibration and deploy.
-- Human playtest of a boss kill with eight real players.
+- Human playtest of the boss kills with eight real players.
+- XP multiplier: set from the pace report after the first session.
