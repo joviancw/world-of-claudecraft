@@ -1067,6 +1067,19 @@ export const pt_BR: EnTranslations = {
       "tooLong": "A mensagem do dia é limitada a {max} caracteres.",
       "saveFailed": "Não foi possível salvar a mensagem do dia; ela será perdida ao reiniciar."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Verificação pronta",
       "close": "Fechar",
@@ -16035,6 +16048,7 @@ export const pt_BR: EnTranslations = {
       "respawn": "Você se sente descansado e inteiro novamente.",
       "respawnKeeperToll": "O Guardião Pálido reviveu você, mas isso tem um preço: o Tributo do Guardião drena seus atributos até que se dissipe.",
       "moonbridgeBanner": "A Ponte Lunar se Ergue",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignorando chat de {name}.",
       "noLongerIgnoring": "Você não ignora mais {name}.",
       "playerNotNearby": "Esse jogador não está por perto.",

@@ -495,6 +495,9 @@ const hudStringsEn = {
       // The Drowned Temple's Moonbridge forming (the Tideglass Colossus falls):
       // the centre-screen banner beside its chat line (log_event_cues.ts).
       moonbridgeBanner: 'The Moonbridge Rises',
+      // A private realm's player-awarded achievement announcement (/award):
+      // the centre-screen banner beside its chat line (log_event_route.ts).
+      customAwardBanner: 'Achievement Unlocked!',
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',
       playerNotNearby: 'That player is not nearby.',

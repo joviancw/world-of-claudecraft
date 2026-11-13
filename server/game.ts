@@ -203,6 +203,7 @@ import {
 } from './cosmetic_op_guard';
 import * as courierWire from './courier_wire';
 import { stampCuratorStanding } from './curator_standing';
+import { createCustomAwards } from './custom_awards';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -1572,9 +1573,6 @@ export class GameServer {
   // The per-guild holder index behind the unsettled gate
   // (server/guild_book_holders.ts owns the maintenance contract).
   private readonly guildBookHolders = new GuildBookHolderIndex<ClientSession>();
-  // Weapon-skin loadouts are whole-record replacements in their dedicated paid
-  // state row. Keep one FIFO per account so rapid apply/detach commands cannot
-  // commit on separate pool clients in reverse order and resurrect stale state.
   // Action-bar layout is a whole-record replacement in its own character column.
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
@@ -1587,6 +1585,7 @@ export class GameServer {
     sendChatNotice: (session, text) => this.sendChatNotice(session, text),
   };
   private readonly presenceHost = presence.presenceHostFrom(this.flairHost, () => this.social);
+  readonly customAwards = createCustomAwards(this.flairHost, this.realmMotd.host, () => pool);
   // Serializes every write of the single global Market blob (the 30s periodic
   // saveMarket/saveMail/saveRifts and the leave-path combined save). All
   // serialize whole-blob shared state; without a queue their transactions
@@ -6769,6 +6768,7 @@ export class GameServer {
         )
           break;
         if (this.isChatMuted(session)) break;
+        if (this.customAwards.handleChat(session, text, receivedAtMs / 1000)) break;
         // The chat lane is a pre-guard CO-LOCATED with the ladder, not at the
         // case entry (R5): the moderation router and the ignore/block/filter
         // management above stay unthrottled, and because the lane is more

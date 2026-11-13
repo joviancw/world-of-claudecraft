@@ -47,6 +47,39 @@ function localizeSimCount(text: string): string {
   return Number.isInteger(n) ? formatNumber(n, { maximumFractionDigits: 0 }) : text;
 }
 
+const CUSTOM_AWARD_EXACT: Record<string, TranslationKey> = {
+  'Usage: /award <name> "<title>" <description>': 'hudChrome.customAward.usage',
+  'You cannot award an achievement to yourself.': 'hudChrome.customAward.self',
+  'That achievement contains a word that is not allowed.': 'hudChrome.customAward.offensive',
+  'No character by that name was found on this realm.': 'hudChrome.customAward.notFound',
+  'That character already has an achievement with that title.': 'hudChrome.customAward.duplicate',
+  'The achievement could not be saved. Try again later.': 'hudChrome.customAward.failed',
+};
+
+export function localizeCustomAwardText(text: string): string | null {
+  const key = CUSTOM_AWARD_EXACT[text];
+  if (key) return t(key);
+  let match = /^ACHIEVEMENT UNLOCKED! (\S+) has earned "([^"]+)"! Awarded by (\S+)\.$/.exec(text);
+  if (match)
+    return t('hudChrome.customAward.line', { name: match[1], title: match[2], giver: match[3] });
+  match = /^You awarded "([^"]+)" to (\S+)\.$/.exec(text);
+  if (match) return t('hudChrome.customAward.sent', { title: match[1], name: match[2] });
+  match = /^Achievement (titles|descriptions) are limited to (\d+) characters\.$/.exec(text);
+  if (match)
+    return t(
+      match[1] === 'titles'
+        ? 'hudChrome.customAward.titleTooLong'
+        : 'hudChrome.customAward.descriptionTooLong',
+      { max: formatNumber(Number(match[2]), { maximumFractionDigits: 0 }) },
+    );
+  match = /^You can award at most (\d+) achievements per day\.$/.exec(text);
+  if (match)
+    return t('hudChrome.customAward.dailyCap', {
+      cap: formatNumber(Number(match[1]), { maximumFractionDigits: 0 }),
+    });
+  return null;
+}
+
 export function localizeSystemText(text: string): string {
   const exact: Record<string, TranslationKey> = {
     'You stand up.': 'hud.logs.standUp',
@@ -85,6 +118,11 @@ export function localizeSystemText(text: string): string {
     return t('hudChrome.realmMotd.tooLong', {
       max: formatNumber(Number(match[1]), { maximumFractionDigits: 0 }),
     });
+  // Private-realm player awards (server/custom_award_command.ts). The title is
+  // player text that never holds a double quote (the parser's delimiter), so
+  // these run before the generic (.+) arms below, like the MOTD above.
+  const award = localizeCustomAwardText(text);
+  if (award !== null) return award;
   // The DEPLOY-WINDOW alias for the one wire-carried reword this packet makes
   // (Masterwrought phase 18 QA, the Drowned Temple enterText de-dash). The sim
   // emits enterText as RAW ENGLISH and this loop matches it by exact bytes, so

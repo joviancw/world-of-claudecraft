@@ -1067,6 +1067,19 @@ export const vi_VN: EnTranslations = {
       "tooLong": "Thông điệp trong ngày có tối đa {max} ký tự.",
       "saveFailed": "Không thể lưu thông điệp trong ngày; thông điệp sẽ mất khi khởi động lại."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Kiểm tra sẵn sàng",
       "close": "Đóng",
@@ -16035,6 +16048,7 @@ export const vi_VN: EnTranslations = {
       "respawn": "Bạn cảm thấy đã được nghỉ ngơi và hồi phục hoàn toàn.",
       "respawnKeeperToll": "Người Gìn Giữ Nhợt Nhạt đã hồi sinh bạn, nhưng bạn yếu đi vì nó: Phí Người Gìn Giữ làm suy giảm chỉ số của bạn cho đến khi nó biến mất.",
       "moonbridgeBanner": "Cầu Trăng Trỗi Dậy",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Đang bỏ qua tin nhắn từ {name}.",
       "noLongerIgnoring": "Không còn bỏ qua {name} nữa.",
       "playerNotNearby": "Người chơi đó không ở gần đây.",

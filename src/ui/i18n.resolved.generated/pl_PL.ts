@@ -1067,6 +1067,19 @@ export const pl_PL: EnTranslations = {
       "tooLong": "Wiadomość dnia może zawierać najwyżej {max} znaków.",
       "saveFailed": "Nie udało się zapisać wiadomości dnia i zniknie ona po ponownym uruchomieniu."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Gotowe sprawdzenie",
       "close": "Zamknąć",
@@ -16035,6 +16048,7 @@ export const pl_PL: EnTranslations = {
       "respawn": "Czujesz się wypoczęty i znów cały.",
       "respawnKeeperToll": "Blady Strażnik cię wskrzesił, ale jesteś przez to słabszy: Danina Strażnika osłabia twoimi atrybuty, aż się zniknie.",
       "moonbridgeBanner": "Księżycowy Most Powstaje",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignorujesz wiadomości od {name}.",
       "noLongerIgnoring": "Nie ignorujesz już {name}.",
       "playerNotNearby": "Tego gracza nie ma w pobliżu.",

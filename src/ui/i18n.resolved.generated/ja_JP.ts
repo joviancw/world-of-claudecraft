@@ -1067,6 +1067,19 @@ export const ja_JP: EnTranslations = {
       "tooLong": "本日のお知らせは最大{max}文字です。",
       "saveFailed": "本日のお知らせを保存できませんでした。サーバーを再起動すると失われます。"
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "準備確認",
       "close": "閉じる",
@@ -16035,6 +16048,7 @@ export const ja_JP: EnTranslations = {
       "respawn": "再び休まり、完全な状態になりました。",
       "respawnKeeperToll": "霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。",
       "moonbridgeBanner": "月の橋が架かる",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
       "playerNotNearby": "そのプレイヤーは近くにいません。",

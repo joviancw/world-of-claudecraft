@@ -424,6 +424,22 @@ export const hudChromeStrings = {
     tooLong: 'The message of the day is limited to {max} characters.',
     saveFailed: 'The message of the day could not be saved and will not survive a restart.',
   },
+  // Private-realm player-awarded achievements (/award, server/custom_awards.ts).
+  // {name}, {giver} and {title} are player-authored or character names, spliced
+  // verbatim; the realm-wide line is `line`, the rest is the giver's feedback.
+  customAward: {
+    line: 'ACHIEVEMENT UNLOCKED! {name} has earned "{title}"! Awarded by {giver}.',
+    sent: 'You awarded "{title}" to {name}.',
+    usage: 'Usage: /award <name> "<title>" <description>',
+    self: 'You cannot award an achievement to yourself.',
+    offensive: 'That achievement contains a word that is not allowed.',
+    notFound: 'No character by that name was found on this realm.',
+    duplicate: 'That character already has an achievement with that title.',
+    failed: 'The achievement could not be saved. Try again later.',
+    titleTooLong: 'Achievement titles are limited to {max} characters.',
+    descriptionTooLong: 'Achievement descriptions are limited to {max} characters.',
+    dailyCap: 'You can award at most {cap} achievements per day.',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {

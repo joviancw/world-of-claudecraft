@@ -1067,6 +1067,19 @@ export const en: EnTranslations = {
       "tooLong": "The message of the day is limited to {max} characters.",
       "saveFailed": "The message of the day could not be saved and will not survive a restart."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Ready Check",
       "close": "Close",
@@ -16035,6 +16048,7 @@ export const en: EnTranslations = {
       "respawn": "You feel rested and whole again.",
       "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       "moonbridgeBanner": "The Moonbridge Rises",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
       "playerNotNearby": "That player is not nearby.",

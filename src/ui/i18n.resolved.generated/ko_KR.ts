@@ -1067,6 +1067,19 @@ export const ko_KR: EnTranslations = {
       "tooLong": "오늘의 메시지는 최대 {max}자까지 입력할 수 있습니다.",
       "saveFailed": "오늘의 메시지를 저장하지 못했습니다. 서버를 재시작하면 사라집니다."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "준비 확인",
       "close": "닫기",
@@ -16035,6 +16048,7 @@ export const ko_KR: EnTranslations = {
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "respawnKeeperToll": "영혼 치유사가 당신을 부활시켰지만 그 대가로 약해졌습니다. 부활 후유증이 사라질 때까지 모든 능력치가 감소합니다.",
       "moonbridgeBanner": "달의 다리가 놓인다",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
       "playerNotNearby": "그 플레이어는 근처에 없습니다.",

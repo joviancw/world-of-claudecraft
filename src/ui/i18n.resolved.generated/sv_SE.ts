@@ -1067,6 +1067,19 @@ export const sv_SE: EnTranslations = {
       "tooLong": "Dagens meddelande får innehålla högst {max} tecken.",
       "saveFailed": "Dagens meddelande kunde inte sparas och försvinner vid en omstart."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Klar kontroll",
       "close": "Stäng",
@@ -16035,6 +16048,7 @@ export const sv_SE: EnTranslations = {
       "respawn": "Du känner dig utvilad och hel igen.",
       "respawnKeeperToll": "Den bleka väktaren har återupplivat dig, men du är svagare för det: väktarens avgift dränerar dina attribut tills det försvinner.",
       "moonbridgeBanner": "Månbron reser sig",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignorerar chatt från {name}.",
       "noLongerIgnoring": "Ignorerar inte längre {name}.",
       "playerNotNearby": "Den spelaren är inte i närheten.",

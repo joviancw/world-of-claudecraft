@@ -72,6 +72,7 @@ import { CLIENT_PERF_REPORTS_SCHEMA } from './client_perf_reports_schema';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import { CRAFT_ROLL_EVENTS_SCHEMA } from './craft_roll_events_db';
+import { CUSTOM_AWARDS_SCHEMA } from './custom_awards_db';
 import { cancelDetachedBackend } from './db_backend_cancel';
 import { dbConnectionBudgetWarning } from './db_connection_budget';
 import type { RankedDeedsAccount } from './deeds_board';
@@ -1324,6 +1325,9 @@ export async function ensureSchema(): Promise<void> {
     // The admin-set realm message of the day (server/realm_motd.ts): one row
     // per realm, FK-references accounts(id) for who set it, so after SCHEMA.
     await client.query(REALM_MOTD_SCHEMA);
+    // Private-realm player awards (server/custom_awards_db.ts): FK-references
+    // characters(id), so after SCHEMA. Keep-forever by design (see the module).
+    await client.query(CUSTOM_AWARDS_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);

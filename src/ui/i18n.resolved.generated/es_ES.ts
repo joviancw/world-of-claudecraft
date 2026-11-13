@@ -1067,6 +1067,19 @@ export const es_ES: EnTranslations = {
       "tooLong": "El mensaje del día admite un máximo de {max} caracteres.",
       "saveFailed": "No se pudo guardar el mensaje del día y se perderá al reiniciar."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Listo cheque",
       "close": "Cerca",
@@ -16035,6 +16048,7 @@ export const es_ES: EnTranslations = {
       "respawn": "Te sientes descansado y completo de nuevo.",
       "respawnKeeperToll": "El Guardián Pálido te ha revivido, pero has salido debilitado: el Tañido del Guardián drena tus atributos hasta que se desvanece.",
       "moonbridgeBanner": "El Puente Lunar se alza",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignorando el chat de {name}.",
       "noLongerIgnoring": "Ya no ignoras a {name}.",
       "playerNotNearby": "Ese jugador no está cerca.",

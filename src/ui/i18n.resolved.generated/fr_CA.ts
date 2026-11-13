@@ -1067,6 +1067,19 @@ export const fr_CA: EnTranslations = {
       "tooLong": "Le message du jour est limité à {max} caractères.",
       "saveFailed": "Le message du jour n'a pas pu être sauvegardé et sera perdu au redémarrage."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Vérification prête",
       "close": "Fermer",
@@ -16035,6 +16048,7 @@ export const fr_CA: EnTranslations = {
       "respawn": "Vous vous sentez reposé et entier à nouveau.",
       "respawnKeeperToll": "Le Veilleur pâle vous a ranimé, mais vous en ressortez affaibli : le Glas du Veilleur draine vos attributs jusqu'à ce qu'il se dissipe.",
       "moonbridgeBanner": "Le Pont de lune s'élève",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Discussion de {name} ignorée.",
       "noLongerIgnoring": "Vous n'ignorez plus {name}.",
       "playerNotNearby": "Ce joueur n'est pas à proximité.",

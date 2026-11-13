@@ -68,12 +68,19 @@ const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 const MOONBRIDGE_OPEN_TEXT = DROWNED_TEMPLE_GATES.find((g) => g.id === 'moonbridge')?.openText;
 
 export interface LogEventCue {
-  sound: 'fiestaRevive' | 'sunderComplete' | null;
+  sound: 'fiestaRevive' | 'sunderComplete' | 'achievement' | null;
   /** The banner's translation key (the HUD renders it through t()). */
-  banner: 'hud.system.moonbridgeBanner' | null;
+  banner: 'hud.system.moonbridgeBanner' | 'hud.system.customAwardBanner' | null;
 }
 
+/** A private realm's player-awarded achievement announcement
+ *  (server/custom_award_command.ts customAwardAnnouncement). */
+export const CUSTOM_AWARD_ANNOUNCEMENT =
+  /^ACHIEVEMENT UNLOCKED! (.+?) has earned "(.+)"! Awarded by (.+)\.$/;
+
 export function logEventCue(text: string): LogEventCue {
+  if (CUSTOM_AWARD_ANNOUNCEMENT.test(text))
+    return { sound: 'achievement', banner: 'hud.system.customAwardBanner' };
   if (text === CHEAT_DEATH_SAVE_TEXT) return { sound: 'fiestaRevive', banner: null };
   // Sundering completion (the weld: profession_event_lines_core.ts).
   if (isSunderCompletionLog(text)) return { sound: 'sunderComplete', banner: null };

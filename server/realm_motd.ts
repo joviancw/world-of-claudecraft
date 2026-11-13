@@ -89,7 +89,8 @@ export class RealmMotd<TSession extends RealmMotdSession> {
   private saves: Promise<void> = Promise.resolve();
 
   constructor(
-    private readonly host: RealmMotdHost<TSession>,
+    // Public so the custom-award announcement reuses the same session fan-out.
+    readonly host: RealmMotdHost<TSession>,
     private readonly store: RealmMotdStore,
   ) {}
 

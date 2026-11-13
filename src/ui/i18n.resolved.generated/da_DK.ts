@@ -1067,6 +1067,19 @@ export const da_DK: EnTranslations = {
       "tooLong": "Dagens besked må højst indeholde {max} tegn.",
       "saveFailed": "Dagens besked kunne ikke gemmes og går tabt ved genstart."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Klar check",
       "close": "Tæt",
@@ -16035,6 +16048,7 @@ export const da_DK: EnTranslations = {
       "respawn": "Du føler dig udhvilet og hel igen.",
       "respawnKeeperToll": "Den blege vogter har genoplivet dig, men du er svagere for det: vogterens livstold er reduceret.",
       "moonbridgeBanner": "Månebroen rejser sig",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignorerer chat fra {name}.",
       "noLongerIgnoring": "Ignorerer ikke længere {name}.",
       "playerNotNearby": "Den spiller er ikke i nærheden.",

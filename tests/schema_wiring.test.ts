@@ -822,6 +822,23 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(h.calls.indexOf('COMMIT')).toBeGreaterThan(motdAt);
   });
 
+  it('applies the private-realm custom awards schema after the characters table', async () => {
+    // CUSTOM_AWARDS_SCHEMA (server/custom_awards_db.ts) backs /award. Its
+    // tests fake the store, so this pin is what fails if the ensureSchema
+    // line in server/db.ts is dropped. Both id columns reference characters(id).
+    await ensureSchema();
+    const awardsAt = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS custom_awards'),
+    );
+    const charactersAt = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS characters'),
+    );
+    expect(awardsAt).toBeGreaterThan(-1);
+    expect(charactersAt).toBeGreaterThan(-1);
+    expect(awardsAt).toBeGreaterThan(charactersAt);
+    expect(h.calls.indexOf('COMMIT')).toBeGreaterThan(awardsAt);
+  });
+
   it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {
     // WOC_MARKET_SCHEMA (server/woc_market_db.ts) backs every marketplace
     // table. Same defined-but-unwired hazard as the DISCORD_SCHEMA lesson:

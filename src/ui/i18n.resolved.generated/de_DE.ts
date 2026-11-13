@@ -1067,6 +1067,19 @@ export const de_DE: EnTranslations = {
       "tooLong": "Die Nachricht des Tages ist auf {max} Zeichen begrenzt.",
       "saveFailed": "Die Nachricht des Tages konnte nicht gespeichert werden und geht beim Neustart verloren."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Bereitschaftsprüfung",
       "close": "Schließen",
@@ -16035,6 +16048,7 @@ export const de_DE: EnTranslations = {
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
       "respawnKeeperToll": "Der Bleiche Hüter hat dich wiederbelebt, doch das schwächt dich: Der Zoll des Hüters zehrt an deinen Attributen, bis er nachlässt.",
       "moonbridgeBanner": "Die Mondbrücke erhebt sich",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",
       "playerNotNearby": "Dieser Spieler ist nicht in der Nähe.",

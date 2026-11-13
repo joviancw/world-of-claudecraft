@@ -1067,6 +1067,19 @@ export const nl_NL: EnTranslations = {
       "tooLong": "Het bericht van de dag mag hoogstens {max} tekens bevatten.",
       "saveFailed": "Het bericht van de dag kon niet worden opgeslagen en gaat bij een herstart verloren."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Klaar controle",
       "close": "Dichtbij",
@@ -16035,6 +16048,7 @@ export const nl_NL: EnTranslations = {
       "respawn": "Je voelt je uitgerust en weer heel.",
       "respawnKeeperToll": "De Bleke Bewaarder heeft je doen herleven, maar je bent er zwakker door geworden: de Tol van de Bewaarder put je eigenschappen uit totdat het vervalt.",
       "moonbridgeBanner": "De Maanbrug Verrijst",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
       "playerNotNearby": "Die speler is niet in de buurt.",

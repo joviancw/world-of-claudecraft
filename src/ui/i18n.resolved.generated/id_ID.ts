@@ -1067,6 +1067,19 @@ export const id_ID: EnTranslations = {
       "tooLong": "Pesan harian dibatasi hingga {max} karakter.",
       "saveFailed": "Pesan harian tidak dapat disimpan dan akan hilang saat dimulai ulang."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Cek Siap",
       "close": "Menutup",
@@ -16035,6 +16048,7 @@ export const id_ID: EnTranslations = {
       "respawn": "Kamu merasa segar dan pulih kembali.",
       "respawnKeeperToll": "Penjaga Pucat telah menghidupkan kembali Anda, namun Anda melemah karenanya: Pajak Penjaga menguras atribut Anda sampai pudar.",
       "moonbridgeBanner": "Jembatan Bulan Bangkit",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
       "playerNotNearby": "Pemain itu tidak berada di dekatmu.",

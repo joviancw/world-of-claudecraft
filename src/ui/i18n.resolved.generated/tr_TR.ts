@@ -1067,6 +1067,19 @@ export const tr_TR: EnTranslations = {
       "tooLong": "Günün mesajı en fazla {max} karakter olabilir.",
       "saveFailed": "Günün mesajı kaydedilemedi ve yeniden başlatıldığında silinecek."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Hazır Kontrolü",
       "close": "Kapalı",
@@ -16035,6 +16048,7 @@ export const tr_TR: EnTranslations = {
       "respawn": "Kendini dinlenmiş ve yeniden sapasağlam hissediyorsun.",
       "respawnKeeperToll": "Soluk Bekçi seni diriltmiş, ancak bunun bedeli vardır: Bekçi Bedeli, atflarını azaltana kadar seni zayıflatır.",
       "moonbridgeBanner": "Ay Köprüsü Yükseliyor",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "{name} oyuncusunun sohbeti görmezden geliniyor.",
       "noLongerIgnoring": "{name} artık görmezden gelinmiyor.",
       "playerNotNearby": "O oyuncu yakında değil.",

@@ -1067,6 +1067,19 @@ export const zh_CN: EnTranslations = {
       "tooLong": "今日消息最多 {max} 个字符。",
       "saveFailed": "今日消息未能保存，服务器重启后将会丢失。"
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "就绪确认",
       "close": "关闭",
@@ -16035,6 +16048,7 @@ export const zh_CN: EnTranslations = {
       "respawn": "你再次感到精力恢复、身体完整。",
       "respawnKeeperToll": "灵魂医者复活了你，但你因此变得虚弱：在复活后遗症消退之前，你的所有属性都会被削弱。",
       "moonbridgeBanner": "月之桥已成",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "已屏蔽来自 {name} 的聊天。",
       "noLongerIgnoring": "不再屏蔽 {name}。",
       "playerNotNearby": "该玩家不在附近。",

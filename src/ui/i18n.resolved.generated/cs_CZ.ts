@@ -1067,6 +1067,19 @@ export const cs_CZ: EnTranslations = {
       "tooLong": "Zpráva dne může mít nejvýše {max} znaků.",
       "saveFailed": "Zprávu dne se nepodařilo uložit a po restartu zmizí."
     },
+    "customAward": {
+      "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
+      "sent": "You awarded \"{title}\" to {name}.",
+      "usage": "Usage: /award <name> \"<title>\" <description>",
+      "self": "You cannot award an achievement to yourself.",
+      "offensive": "That achievement contains a word that is not allowed.",
+      "notFound": "No character by that name was found on this realm.",
+      "duplicate": "That character already has an achievement with that title.",
+      "failed": "The achievement could not be saved. Try again later.",
+      "titleTooLong": "Achievement titles are limited to {max} characters.",
+      "descriptionTooLong": "Achievement descriptions are limited to {max} characters.",
+      "dailyCap": "You can award at most {cap} achievements per day."
+    },
     "readyCheck": {
       "title": "Kontrola připravenosti",
       "close": "Blízko",
@@ -16035,6 +16048,7 @@ export const cs_CZ: EnTranslations = {
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
       "respawnKeeperToll": "Bledý strážce tě oživil, ale je to na tobě znát: Strážcovo mýto ti oslabuje vlastnosti, dokud nevyprchá.",
       "moonbridgeBanner": "Měsíční most povstává",
+      "customAwardBanner": "Achievement Unlocked!",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
       "playerNotNearby": "Tento hráč není poblíž.",
