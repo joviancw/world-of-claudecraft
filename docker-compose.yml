@@ -224,6 +224,16 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       EMAIL_API_URL: ${EMAIL_API_URL:-}
       EMAIL_API_KEY: ${EMAIL_API_KEY:-}
+      # Private eight-player realm rules (server/private_realm_config.ts). Off
+      # unless PRIVATE_REALM is exactly 1; an empty knob keeps its default.
+      PRIVATE_REALM: ${PRIVATE_REALM:-}
+      PRIVATE_REALM_KILL_XP: ${PRIVATE_REALM_KILL_XP:-}
+      PRIVATE_REALM_QUEST_XP: ${PRIVATE_REALM_QUEST_XP:-}
+      PRIVATE_REALM_DUNGEON_PLAYERS: ${PRIVATE_REALM_DUNGEON_PLAYERS:-}
+      PRIVATE_REALM_DUNGEON_MIN_LEVEL: ${PRIVATE_REALM_DUNGEON_MIN_LEVEL:-}
+      PRIVATE_REALM_DUNGEON_HP: ${PRIVATE_REALM_DUNGEON_HP:-}
+      PRIVATE_REALM_DUNGEON_DMG: ${PRIVATE_REALM_DUNGEON_DMG:-}
+      PRIVATE_REALM_AWARD_DAILY_CAP: ${PRIVATE_REALM_AWARD_DAILY_CAP:-}
       # Optional Steam account link and Book of Deeds achievement mirror.
       STEAM_ENABLED: ${STEAM_ENABLED:-}
       STEAM_APP_ID: ${STEAM_APP_ID:-}
