@@ -1,4 +1,4 @@
-// Private-realm eight-player dungeons: a raid group of up to eight level-20
+// Private-realm nine-player dungeons: a raid group of up to nine level-20
 // players may walk into a standard five-player dungeon together, shares one
 // claim, and fights enemies scaled by the private-realm multipliers
 // (src/sim/private_realm.ts, instances/private_realm_scaling.ts). A stock
@@ -13,12 +13,44 @@ import {
   claimGroupScale,
 } from '../src/sim/instances/private_realm_scaling';
 import { spawnBossAdds } from '../src/sim/mob/boss_mechanics';
-import { type PrivateRealmRules, resolvePrivateRealmRules } from '../src/sim/private_realm';
+import {
+  type PrivateRealmRules,
+  privateRealmGroupScale,
+  privateRealmRaidAdmits,
+  resolvePrivateRealmRules,
+} from '../src/sim/private_realm';
+import { PARTY_MAX } from '../src/sim/social/party';
 import { type InstanceSlot, Sim } from '../src/sim/sim';
 import { type Entity, xpToReachLevel } from '../src/sim/types';
 
 const DUNGEON = 'hollow_crypt';
 const RAID_DENIED = 'Raid groups cannot enter standard dungeons.';
+describe('private-realm raid size gates', () => {
+  const rules = resolvePrivateRealmRules();
+
+  it.each([8, 9] as const)('privateRealmRaidAdmits allows %i level-20 members', (size) => {
+    expect(privateRealmRaidAdmits(rules, Array.from({ length: size }, () => 20))).toBe(true);
+  });
+
+  it('privateRealmRaidAdmits refuses ten members', () => {
+    expect(privateRealmRaidAdmits(rules, Array.from({ length: 10 }, () => 20))).toBe(false);
+  });
+
+  it.each([8, 9] as const)(
+    'privateRealmGroupScale uses the dungeon multipliers for %i raid members',
+    (size) => {
+      expect(privateRealmGroupScale(rules, true, size, PARTY_MAX, false)).toEqual({
+        hp: rules.dungeons.healthMultiplier,
+        dmg: rules.dungeons.damageMultiplier,
+      });
+    },
+  );
+
+  it('privateRealmGroupScale stays off for a five-player party', () => {
+    expect(privateRealmGroupScale(rules, false, 5, PARTY_MAX, false)).toBeNull();
+  });
+});
+
 const FIVE_PLAYER_DUNGEONS = [
   'hollow_crypt',
   'sunken_bastion',
@@ -83,7 +115,7 @@ function mobsOf(sim: Sim, claim: InstanceSlot): Entity[] {
     .filter((m): m is Entity => m !== undefined && m.kind === 'mob');
 }
 
-describe('eight-player raid admission', () => {
+describe('nine-player raid admission', () => {
   it('a stock world still refuses a raid group at a five-player dungeon door', () => {
     const sim = makeSim(null);
     const pids = group(sim, 'R', 8, true);
@@ -92,17 +124,20 @@ describe('eight-player raid admission', () => {
     expect(errors).toContain(RAID_DENIED);
   });
 
-  it('a private realm admits eight level-20 raiders into ONE shared claim', () => {
-    const sim = makeSim(resolvePrivateRealmRules());
-    const pids = group(sim, 'R', 8, true);
-    for (const pid of pids) expect(enterDungeon(sim.ctx, DUNGEON, pid)).toBe(true);
-    const claim = claimOf(sim, pids[0]);
-    expect(sim.instances.filter((i) => i.partyKey === claim.partyKey)).toHaveLength(1);
-    expect([...claim.enteredBy].sort()).toEqual([...pids].sort());
-    for (const pid of pids) {
-      expect(sim.instanceInfoAt(sim.entities.get(pid)!.pos)?.dungeonId).toBe(DUNGEON);
-    }
-  });
+  it.each([8, 9] as const)(
+    'a private realm admits %i level-20 raiders into ONE shared claim',
+    (size) => {
+      const sim = makeSim(resolvePrivateRealmRules());
+      const pids = group(sim, 'R', size, true);
+      for (const pid of pids) expect(enterDungeon(sim.ctx, DUNGEON, pid)).toBe(true);
+      const claim = claimOf(sim, pids[0]);
+      expect(sim.instances.filter((i) => i.partyKey === claim.partyKey)).toHaveLength(1);
+      expect([...claim.enteredBy].sort()).toEqual([...pids].sort());
+      for (const pid of pids) {
+        expect(sim.instanceInfoAt(sim.entities.get(pid)!.pos)?.dungeonId).toBe(DUNGEON);
+      }
+    },
+  );
 
   it('refuses a raid with a member below the endgame level', () => {
     const sim = makeSim(resolvePrivateRealmRules());
@@ -114,12 +149,27 @@ describe('eight-player raid admission', () => {
 
   it('refuses a raid larger than the private-realm target', () => {
     const sim = makeSim(resolvePrivateRealmRules());
-    const pids = group(sim, 'R', 9, true);
+    const pids = group(sim, 'R', 10, true);
     expect(enterDungeon(sim.ctx, DUNGEON, pids[0])).toBe(false);
   });
 });
 
-describe('eight-player enemy scaling', () => {
+describe('raid-sized enemy scaling', () => {
+  it.each([8, 9] as const)(
+    'claimGroupScale is on for %i raid members and matches the configured multipliers',
+    (size) => {
+      const rules = resolvePrivateRealmRules();
+      const sim = makeSim(rules);
+      const raid = group(sim, 'R', size, true);
+      for (const pid of raid) expect(enterDungeon(sim.ctx, DUNGEON, pid)).toBe(true);
+      const claim = claimOf(sim, raid[0]);
+      expect(claimGroupScale(sim.ctx, rules, claim, () => false)).toEqual({
+        hp: rules.dungeons.healthMultiplier,
+        dmg: rules.dungeons.damageMultiplier,
+      });
+    },
+  );
+
   it('scales a raid claim by the configured multipliers and leaves a party claim alone', () => {
     const rules = resolvePrivateRealmRules({
       dungeons: { healthMultiplier: 1.5, damageMultiplier: 1.2 },
@@ -159,7 +209,7 @@ describe('eight-player enemy scaling', () => {
     ),
   )('scales every placement in %s (%s) by the health multiplier', (dungeon, mode) => {
     const sim = makeSim(resolvePrivateRealmRules());
-    const raid = group(sim, 'R', 8, true);
+    const raid = group(sim, 'R', 9, true);
     const party = group(sim, 'P', 5, false);
     for (const lead of [raid[0], party[0]]) sim.setDungeonDifficulty(mode, lead);
     for (const pid of [...raid, ...party]) expect(enterDungeon(sim.ctx, dungeon, pid)).toBe(true);
@@ -191,9 +241,9 @@ describe('eight-player enemy scaling', () => {
     expect(off).toEqual([]);
   });
 
-  it('never stacks the scale on repeated ticks', () => {
+  it.each([8, 9] as const)('never stacks the scale on repeated ticks (%i members)', (size) => {
     const sim = makeSim(resolvePrivateRealmRules());
-    const raid = group(sim, 'R', 8, true);
+    const raid = group(sim, 'R', size, true);
     for (const pid of raid) enterDungeon(sim.ctx, DUNGEON, pid);
     sim.tick();
     const before = mobsOf(sim, claimOf(sim, raid[0])).map((m) => m.maxHp);

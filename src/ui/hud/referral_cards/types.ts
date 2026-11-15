@@ -26,4 +26,6 @@ export interface ReferralCardsHost {
   /** Parent owns the shared FocusManager and cross-window coordination. */
   focusWindow(selector: string): void;
   onClose(): void;
+  /** When true, launchers stay hidden and the window cannot open. */
+  suppressed?(): boolean;
 }

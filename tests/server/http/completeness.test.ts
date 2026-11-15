@@ -116,6 +116,10 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/custom-awards',
   '/api/custom-awards/hide',
   '/api/custom-awards/reject',
+  '/api/custom-award-templates',
+  '/api/custom-awards/issue',
+  '/api/custom-awards/given',
+  '/api/custom-awards/public',
   '/api/discord/queue-pings',
   '/api/characters/:id/deeds-recent',
   '/api/characters/:id/appearance-reroll',
@@ -366,6 +370,12 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/custom-awards' },
     { method: 'POST', path: '/api/custom-awards/hide' },
     { method: 'POST', path: '/api/custom-awards/reject' },
+    { method: 'GET', path: '/api/custom-award-templates' },
+    { method: 'POST', path: '/api/custom-award-templates' },
+    { method: 'DELETE', path: '/api/custom-award-templates' },
+    { method: 'POST', path: '/api/custom-awards/issue' },
+    { method: 'GET', path: '/api/custom-awards/given' },
+    { method: 'GET', path: '/api/custom-awards/public' },
     // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
     // registry-only on the deeds broadcasts shape.
     { method: 'GET', path: '/api/discord/queue-pings' },

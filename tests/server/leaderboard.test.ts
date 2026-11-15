@@ -577,25 +577,37 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 
 describe('status handler (name-list trim deviation)', () => {
   it('returns counts and capability adverts with NO names list', async () => {
-    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
-    const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
-    await handlerFor('/api/status')(ctx);
-    const { status, body } = captured(ctx.res);
-    expect(status).toBe(200);
-    expect(body).toEqual({
-      ok: true,
-      realm: REALM_NAME,
-      players_online: 4,
-      // The configured realm cap, advertised so the client realm list can show Full.
-      players_cap: 250,
-      steam: { enabled: false },
-      epic: { enabled: false },
-      // The /dev GUI capability advert. False here because the suite runs without
-      // ALLOW_DEV_COMMANDS, which is also the production posture.
-      dev_commands: false,
-      profiler_invulnerability: false,
-    });
-    expect('names' in (body as object)).toBe(false);
+    const prevDev = process.env.ALLOW_DEV_COMMANDS;
+    const prevPrivate = process.env.PRIVATE_REALM;
+    try {
+      delete process.env.ALLOW_DEV_COMMANDS;
+      delete process.env.PRIVATE_REALM;
+      configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
+      const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(ctx);
+      const { status, body } = captured(ctx.res);
+      expect(status).toBe(200);
+      expect(body).toEqual({
+        ok: true,
+        realm: REALM_NAME,
+        players_online: 4,
+        // The configured realm cap, advertised so the client realm list can show Full.
+        players_cap: 250,
+        steam: { enabled: false },
+        epic: { enabled: false },
+        // The /dev GUI capability advert. False here because the suite runs without
+        // ALLOW_DEV_COMMANDS, which is also the production posture.
+        dev_commands: false,
+        profiler_invulnerability: false,
+        private_realm: false,
+      });
+      expect('names' in (body as object)).toBe(false);
+    } finally {
+      if (prevDev === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = prevDev;
+      if (prevPrivate === undefined) delete process.env.PRIVATE_REALM;
+      else process.env.PRIVATE_REALM = prevPrivate;
+    }
   });
 
   // The advert must track the env, not a boot-time snapshot: the /api/perf gate

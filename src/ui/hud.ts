@@ -244,6 +244,7 @@ import {
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
 } from './combat_sfx';
+import { isCommerceChromeHiddenOnDocument } from './commerce_chrome_policy';
 import { compassView } from './compass';
 import {
   buildCompassMarks,
@@ -257,6 +258,13 @@ import { formatMinimapCoords } from './coords';
 import { formatCount } from './count_format';
 import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
+import {
+  type CustomAwardAnnouncementParts,
+  parseCustomAwardAnnouncement,
+  parseCustomAwardSent,
+} from './custom_award_log_feedback';
+import { CustomAwardRevealPainter } from './hud/custom_awards/custom_award_reveal_painter';
+import { customAwardRevealDedupeKey } from './hud/custom_awards/custom_award_reveal_view';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { DayNightDialPainter } from './day_night_dial_painter';
@@ -940,6 +948,11 @@ import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import {
+  mountPrivateRealmAwardsPromo,
+  PRIVATE_REALM_AWARDS_PROMO_ID,
+  privateRealmAwardsPromoLabels,
+} from './private_realm_awards_promo';
+import {
   mountStorePromoCard,
   type StorePromoCardController,
   storePromoLabels,
@@ -1121,6 +1134,8 @@ export interface ClaudiumHooks {
 
 export interface HudFeatures {
   dailyRewardsEnabled: boolean;
+  /** Hides WOC Store, cosmetics, referral/stamp card, and store promo banners. */
+  commerceChromeHidden?: boolean;
   devCommandsEnabled?: boolean;
   constrainedMemory?: boolean;
 }
@@ -2123,6 +2138,13 @@ export class Hud {
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
   private storePromoCard: StorePromoCardController | null = null;
+  private awardsPromoCard: StorePromoCardController | null = null;
+  // After a Deeds UI issue, skip a duplicate giver banner when the server line lands.
+  private suppressCustomAwardSentCelebrateUntil = 0;
+  private readonly customAwardReveal = new CustomAwardRevealPainter({
+    mountParent: () => document.getElementById('ui'),
+    reducedMotion: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  });
   // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
@@ -2198,6 +2220,9 @@ export class Hud {
     private keybinds: Keybinds,
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
+    if (this.commerceChromeHidden()) {
+      document.getElementById('mm-cosmetics')?.toggleAttribute('hidden', true);
+    }
     hydrateCrestImageFallbacks(document);
     // A world quest's item reward embeds the same card the bags show.
     this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim, {
@@ -2598,7 +2623,7 @@ export class Hud {
       window,
       storage: localStorage,
       isMobileLayout: () => this.isMobileLayout(),
-      hasStorePromoCard: () => this.storePromoCard !== null,
+      hasStorePromoCard: () => this.storePromoCard !== null || this.awardsPromoCard !== null,
       uiScale: getUiScale,
       isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
       snapToGrid: this.frameSnapToGridActive,
@@ -2849,7 +2874,7 @@ export class Hud {
     const mobileDailyRewardsButton = document.getElementById(
       'mobile-daily-rewards',
     ) as HTMLButtonElement | null;
-    if (!this.dailyRewardsEnabled()) {
+    if (!this.dailyRewardsEnabled() || this.commerceChromeHidden()) {
       dailyRewardsButton?.setAttribute('hidden', '');
       mobileDailyRewardsButton?.setAttribute('hidden', '');
       $('#daily-rewards-window').style.display = 'none';
@@ -5192,6 +5217,7 @@ export class Hud {
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
     openReferralCards: () => this.referralCards.open(),
+    referralCardsAvailable: () => !isCommerceChromeHiddenOnDocument(),
     openSelfMenu: (x, y) => this.openSelfContextMenu(x, y),
     openUnitMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
     openNameMenu: (name, x, y) => this.openChatPlayerContextMenu(name, x, y),
@@ -5208,6 +5234,7 @@ export class Hud {
     available: () => this.devCommandsAvailable,
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#dev-command-window'),
+    previewCustomAwardReveal: () => this.previewCustomAwardReveal(),
     ...this.windowFocus('#dev-command-window'),
   });
   // Bags window painter (bags_view.ts core + bags_window.ts painter). It composes
@@ -5413,6 +5440,7 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#deeds-window'),
     onWatchChanged: () => this.updateDeedTracker(),
+    onCustomAwardIssued: (title, recipient) => this.celebrateCustomAwardIssued(title, recipient),
   });
   // Professions window painter (professions_view.ts core + the composed
   // profession_identity_view model + professions_window.ts painter): the
@@ -5730,7 +5758,9 @@ export class Hud {
     },
     openPrestige: () => this.openPrestigeDialog(),
     openDeeds: () => this.openDeeds(),
-    openCosmetics: () => this.cosmeticsWindow.open(),
+    openCosmetics: () => {
+      if (!this.commerceChromeHidden()) this.cosmeticsWindow.open();
+    },
     openReliquary: () => this.openReliquary(),
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
@@ -5781,6 +5811,11 @@ export class Hud {
     slotName: (slot) => itemSlotName(slot),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
     mountPreview: (container, params) => this.mountInspectPreview(container, params),
+    customAwardsForPlayer: (name, self) => {
+      const src = (this.sim as import('../world_api').IWorld).customAwards;
+      if (!src) return Promise.resolve(null);
+      return self ? src.list() : src.listPublicForName(name);
+    },
   });
   // Options window painter (options_view.ts core + options_window.ts painter). The
   // window renders no item rows, so it composes no PainterHostPresentation bag; it
@@ -6053,6 +6088,7 @@ export class Hud {
     snapshotChanged: () => {
       if (this.questlogWindow.isOpen) this.questlogWindow.render();
     },
+    suppressed: () => isCommerceChromeHiddenOnDocument(),
   });
   private readonly questlogWindow = new QuestLogWindow({
     ...this.presentationBag,
@@ -6069,6 +6105,7 @@ export class Hud {
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     openReferralCards: () => this.referralCards.open(),
+    stampCardQuestsEnabled: () => !isCommerceChromeHiddenOnDocument(),
   });
   private readonly treasureMapWindow = new TreasureMapWindow({ world: () => this.sim });
   private readonly purchaseRewards = new PurchaseRewardDialogs((id) => this.sim.mailTake(id));
@@ -6789,6 +6826,9 @@ export class Hud {
     // and exact focus (Intentional Gathering PR3).
     this.harvestPreferenceController.relocalize();
     this.storePromoCard?.relocalize(storePromoLabels());
+    this.awardsPromoCard?.relocalize({
+      [PRIVATE_REALM_AWARDS_PROMO_ID]: privateRealmAwardsPromoLabels(),
+    });
     // The mount-race strip and controls gate on race id / phase / countdown
     // number, none of which move with the locale (tests/language_fanout_registry).
     this.mountRaceStrip.relocalize();
@@ -8355,8 +8395,21 @@ export class Hud {
     return this.alwaysShowAllBuffs ? 'ultra' : this.fxTier();
   }
 
+  commerceChromeSuppressed(): boolean {
+    return this.features.commerceChromeHidden === true;
+  }
+
+  private commerceChromeHidden(): boolean {
+    return this.commerceChromeSuppressed();
+  }
+
   private dailyRewardsEnabled(): boolean {
-    return this.features.dailyRewardsEnabled;
+    return this.features.dailyRewardsEnabled && !this.commerceChromeHidden();
+  }
+
+  toggleCosmetics(): void {
+    if (this.commerceChromeHidden()) return;
+    this.cosmeticsWindow.toggle();
   }
 
   private syncDailyRewardsSurfaceLabels(): void {
@@ -12991,8 +13044,23 @@ export class Hud {
             this.combatLog(text, ev.color ?? HUD_LOG.PLAIN);
           else this.log(text, ev.color ?? HUD_LOG.PLAIN);
           const cue = logEventCue(ev.text);
-          if (cue.sound) audio[cue.sound]();
-          if (cue.banner) this.showBanner(t(cue.banner));
+          const announced = parseCustomAwardAnnouncement(ev.text);
+          if (announced) {
+            this.celebrateCustomAwardUnlocked(announced);
+            if (announced.recipient === this.sim.player?.name) this.customAwardsFacetRefresh();
+          } else {
+            if (cue.sound) audio[cue.sound]();
+          }
+          if (!announced && parseCustomAwardSent(ev.text)) {
+            const sentLine = localizeSystemText(ev.text) ?? text;
+            if (performance.now() >= this.suppressCustomAwardSentCelebrateUntil) {
+              this.celebrateCustomAwardIssuedLine(ev.text);
+            } else {
+              this.log(sentLine, HUD_LOG.NOTICE);
+            }
+          } else if (cue.banner) {
+            this.showBanner(t(cue.banner));
+          }
           const bubble = chatBubbleKind(ev.text);
           if (ev.entityId !== undefined && bubble !== null)
             this.renderer.showChatBubble(ev.entityId, text, bubble === 'yell');
@@ -14188,9 +14256,64 @@ export class Hud {
     variant: BannerVariant = 'default',
     motion = true,
     decorativeIconUrl?: string,
-    subtext?: string,
+    subtext?: string | string[],
   ): void {
     this.showBanner(text, motion, decorativeIconUrl, variant, subtext, 2600, null, bannerClass);
+  }
+
+  /** Realm-wide custom award unlock (log line from the server). */
+  celebrateCustomAwardUnlocked(parts: CustomAwardAnnouncementParts): void {
+    this.enqueueCustomAwardReveal(parts);
+  }
+
+  /** Giver feedback after a Deeds template issue (before the chat line may land). */
+  celebrateCustomAwardIssued(title: string, recipient: string): void {
+    this.suppressCustomAwardSentCelebrateUntil = performance.now() + 4000;
+    const giver = this.sim.player?.name ?? '';
+    this.enqueueCustomAwardReveal({ recipient, title, giver });
+    const detail = t('hudChrome.customAward.sent', { title, name: recipient });
+    this.log(detail, HUD_LOG.GOOD);
+    void this.customAwardsFacetRefresh();
+  }
+
+  private celebrateCustomAwardIssuedLine(detailLine: string): void {
+    const sent = parseCustomAwardSent(detailLine);
+    if (!sent) return;
+    const giver = this.sim.player?.name ?? '';
+    this.enqueueCustomAwardReveal({ recipient: sent.recipient, title: sent.title, giver });
+  }
+
+  private enqueueCustomAwardReveal(
+    parts: CustomAwardAnnouncementParts,
+    opts?: { playSound?: boolean; description?: string },
+  ): void {
+    const self = this.sim.player?.name ?? '';
+    this.customAwardReveal.enqueue({
+      recipient: parts.recipient,
+      title: parts.title,
+      giver: parts.giver,
+      description: opts?.description,
+      isRecipient: parts.recipient === self,
+      playSound: opts?.playSound ?? true,
+      dedupeKey: customAwardRevealDedupeKey(parts),
+    });
+  }
+
+  /** Dev Command Center: sample reveal without granting an award. */
+  previewCustomAwardReveal(): void {
+    const name = this.sim.player?.name ?? 'Adventurer';
+    this.customAwardReveal.previewRecipient({
+      recipient: name,
+      title: 'Fish Whisperer',
+      giver: 'Ann Example',
+      description: 'Caught every lurkfin in the marsh without a single splash.',
+    });
+  }
+
+  private customAwardsFacetRefresh(): void {
+    if (this.deedsWindow.isOpen) {
+      this.deedsWindow.refreshCustomAwards();
+    }
   }
 
   /** The paint half of the banner slot: renders one payload and arms the
@@ -15503,10 +15626,6 @@ export class Hud {
     this.lootExplorerWindow.toggle();
   }
 
-  toggleCosmetics(): void {
-    this.cosmeticsWindow.toggle();
-  }
-
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
   // elided writers make an unchanged repaint free.
@@ -16529,6 +16648,7 @@ export class Hud {
 
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
   attachClaudium(hooks: ClaudiumHooks): void {
+    if (this.commerceChromeHidden()) return;
     this.claudiumHooks = hooks;
     this.syncDailyRewardsSurfaceLabels();
     this.claudiumBalance.reset();
@@ -16536,7 +16656,7 @@ export class Hud {
   }
 
   attachStorePromoCard(): void {
-    if (this.storePromoCard || !this.claudiumHooks) return;
+    if (this.commerceChromeHidden() || this.storePromoCard || !this.claudiumHooks) return;
     const host = document.getElementById('chatlog-wrap');
     if (!host) return;
     this.storePromoCard = mountStorePromoCard(host, {
@@ -16549,6 +16669,23 @@ export class Hud {
       returnFocusTo: () => document.getElementById('daily-rewards-button'),
       onDismiss: () => {
         this.storePromoCard = null;
+      },
+    });
+    this.chatGeometry.reapply();
+  }
+
+  /** Gaming-weekend awards promo (private realm): same slot as the WOC Store card. */
+  attachPrivateRealmAwardsPromo(): void {
+    if (!this.commerceChromeHidden() || this.awardsPromoCard || this.storePromoCard) return;
+    const host = document.getElementById('chatlog-wrap');
+    if (!host) return;
+    this.awardsPromoCard = mountPrivateRealmAwardsPromo(host, {
+      openDeedsTitles: () => this.openDeeds('titles'),
+      returnFocusTo: () =>
+        document.getElementById('mm-deeds') ?? document.getElementById('mobile-deeds'),
+      onDismiss: () => {
+        this.awardsPromoCard = null;
+        this.chatGeometry.reapply();
       },
     });
     this.chatGeometry.reapply();

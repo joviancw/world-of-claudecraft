@@ -22,8 +22,9 @@ function charRow(over: Partial<CharacterRow> = {}): CharacterRow {
   };
 }
 
-function xpRow(name: string, lifetimeXp: number): LifetimeXpLeaderRow {
+function xpRow(name: string, lifetimeXp: number, characterId = 1): LifetimeXpLeaderRow {
   return {
+    characterId,
     name,
     class: 'warrior',
     level: 60,

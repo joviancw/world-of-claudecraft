@@ -169,6 +169,7 @@ export const en_XA: EnTranslations = {
     "serverRequirement": "[Šéŕʋéŕ çĥéáţš šţíļļ ŕéɋúíŕé ÁĻĻÓŴ_ÐÉƲ_ÇÓⱮⱮÁÑÐŠ=1.]",
     "invalidValues": "[Çĥóóšé ʋáļíð ʋáļúéš ƀéƒóŕé ŕúññíñĝ ţĥíš çóɱɱáñð.]",
     "sent": "[Šéñţ: {command}]",
+    "sentLocal": "[Ŕáñ: {action}]",
     "run": "[Ŕúñ]",
     "fields": {
       "level": "[Ļéʋéļ]",
@@ -328,6 +329,10 @@ export const en_XA: EnTranslations = {
       "hillend": {
         "label": "[Éñð ĥíļļ]",
         "description": "[Ɱáķé ţĥé çúŕŕéñţ ĥíļļ ƒáļļ ñóŵ.]"
+      },
+      "customAwardRevealPreview": {
+        "label": "[Þŕéʋíéŵ ƒŕíéñð áŵáŕð ŕéʋéáļ]",
+        "description": "[Þļáý ţĥé ƒíʋé-šéçóñð áçĥíéʋéɱéñţ ŕéʋéáļ óʋéŕļáý ŵíţĥ šáɱþļé çóþý.]"
       }
     }
   },
@@ -1070,6 +1075,7 @@ export const en_XA: EnTranslations = {
     "customAward": {
       "line": "[ÁÇĤÍÉƲÉⱮÉÑŢ ÚÑĻÓÇĶÉÐ! {name} ĥáš éáŕñéð \"{title}\"! Áŵáŕðéð ƀý {giver}.]",
       "sent": "[Ýóú áŵáŕðéð \"{title}\" ţó {name}.]",
+      "sentCelebrate": "[Áŵáŕð šéñţ!]",
       "usage": "[Úšáĝé: /áŵáŕð <ñáɱé> \"<ţíţļé>\" <ðéšçŕíþţíóñ>]",
       "self": "[Ýóú çáññóţ áŵáŕð áñ áçĥíéʋéɱéñţ ţó ýóúŕšéļƒ.]",
       "offensive": "[Ţĥáţ áçĥíéʋéɱéñţ çóñţáíñš á ŵóŕð ţĥáţ íš ñóţ áļļóŵéð.]",
@@ -1094,7 +1100,42 @@ export const en_XA: EnTranslations = {
       "removeTitle": "[Ŕéɱóʋé ţíţļé]",
       "wearTitleAria": "[Ŵéáŕ {title} áš ýóúŕ ţíţļé]",
       "removeTitleAria": "[Šţóþ ŵéáŕíñĝ {title} áš ýóúŕ ţíţļé]",
-      "actionFailed": "[Ţĥáţ çĥáñĝé çóúļð ñóţ ƀé šáʋéð. Ţŕý áĝáíñ ļáţéŕ.]"
+      "actionFailed": "[Ţĥáţ çĥáñĝé çóúļð ñóţ ƀé šáʋéð. Ţŕý áĝáíñ ļáţéŕ.]",
+      "templatesSectionTitle": "[Ýóúŕ Áŵáŕðš]",
+      "templatesHint": "[Çŕéáţé áñ áŵáŕð ĥéŕé, ţĥéñ íššúé íţ ţó á ƒŕíéñð ƀý çĥáŕáçţéŕ ñáɱé.]",
+      "templatesEmpty": "[Ñó šáʋéð áŵáŕðš ýéţ. Çŕéáţé óñé áƀóʋé.]",
+      "templatesNew": "[Ñéŵ áŵáŕð]",
+      "templatesSave": "[Šáʋé]",
+      "templatesCancel": "[Çáñçéļ]",
+      "templatesTitleField": "[Áŵáŕð ţíţļé]",
+      "templatesTitlePlaceholder": "[Ţíţļé]",
+      "templatesDescField": "[Áŵáŕð ðéšçŕíþţíóñ]",
+      "templatesDescPlaceholder": "[Ðéšçŕíþţíóñ (óþţíóñáļ)]",
+      "templatesTitleRequired": "[Éñţéŕ á ţíţļé ƀéƒóŕé šáʋíñĝ.]",
+      "templatesInvalid": "[Ţĥáţ áŵáŕð çóúļð ñóţ ƀé šáʋéð. Çĥéçķ ţĥé ļéñĝţĥ áñð ŵóŕðíñĝ.]",
+      "templateCap": "[Ýóú ĥáʋé ţóó ɱáñý šáʋéð áŵáŕðš. Ðéļéţé óñé ƒíŕšţ.]",
+      "templatesIssue": "[Íššúé]",
+      "templatesDelete": "[Ðéļéţé]",
+      "templatesSend": "[Šéñð]",
+      "templatesSending": "[Šéñðíñĝ…]",
+      "templatesCancelIssue": "[Çáñçéļ]",
+      "templatesRecipientField": "[Ŕéçíþíéñţ çĥáŕáçţéŕ ñáɱé]",
+      "templatesRecipientPlaceholder": "[Çĥáŕáçţéŕ ñáɱé]",
+      "templatesRecipientRequired": "[Éñţéŕ ţĥé ŕéçíþíéñţ çĥáŕáçţéŕ ñáɱé.]",
+      "templatesIssued": "[Áŵáŕð šéñţ.]",
+      "templatesDailyCap": "[Ýóú ŕéáçĥéð ţĥé ðáíļý ļíɱíţ ƒóŕ šéñðíñĝ áŵáŕðš.]",
+      "givenSectionTitle": "[Áŵáŕðš Ýóú Ĝáʋé]",
+      "givenEmpty": "[Ñó áŵáŕðš íššúéð ýéţ.]",
+      "givenTo": "[Ĝíʋéñ ţó {name} óñ {date}]",
+      "inspectSectionTitle": "[Ƒŕíéñð Áŵáŕðš]",
+      "gamingWeekendPromoOpen": "[Ɓóóķ óƒ Ðééðš: Ţíţļéš áñð Áŵáŕðš]",
+      "gamingWeekendPromoClose": "[Ðíšɱíšš ŵééķéñð ñóţíçé]",
+      "gamingWeekendPromoEyebrow": "[Ĝáɱíñĝ ŵééķéñð]",
+      "gamingWeekendPromoTitle": "[Ŵé áŕé ĝíʋíñĝ áŵáý þáţçĥéš ŵíţĥ Ƒŕíéñð Áŵáŕðš ţĥíš ĝáɱíñĝ ŵééķéñð. Óþéñ ţĥé Ɓóóķ óƒ Ðééðš áñð áŵáŕð ýóúŕ Ɓóýž!]",
+      "gamingWeekendPromoCta": "[Óþéñ Ɓóóķ óƒ Ðééðš]",
+      "revealEyebrow": "[Áçĥíéʋéɱéñţ Úñļóçķéð]",
+      "revealRecipient": "[{name} éáŕñéð ţĥíš ĥóñóŕ]",
+      "revealGiver": "[Áŵáŕðéð ƀý {name}]"
     },
     "readyCheck": {
       "title": "[Ŕéáðý Çĥéçķ]",
@@ -2131,6 +2172,7 @@ export const en_XA: EnTranslations = {
       "close": "[Çļóšé]",
       "tabsLabel": "[Ĥíĝĥ-šçóŕé ƀóáŕðš]",
       "tabPlayers": "[Þļáýéŕš]",
+      "friendAwardsCol": "[Ƒŕíéñð áŵáŕðš]",
       "tabGuilds": "[Ĝúíļðš]",
       "tabDevs": "[Ðéʋéļóþéŕš]",
       "guildName": "[Ĝúíļð]",
@@ -13703,6 +13745,7 @@ export const en_XA: EnTranslations = {
     "stats": "[Šţáţíšţíçš]",
     "about": "[Áƀóúţ]",
     "highscores": "[Ĥíĝĥ Šçóŕéš]",
+    "friendAwards": "[Ƒŕíéñð Áŵáŕðš]",
     "wiki": "[Ŵíķí]",
     "news": "[Ñéŵš]",
     "download": "[Ðóŵñļóáð]",
@@ -13743,6 +13786,31 @@ export const en_XA: EnTranslations = {
   "highscores": {
     "title": "[Ĥíĝĥ Šçóŕéš Ļéáðéŕƀóáŕð]",
     "desc": "[Ţŕáçķ ţĥé ŵóŕļð'š ĝŕéáţéšţ çĥáɱþíóñš áñð çóɱþáŕé ýóúŕ þŕóĝŕéšš.]"
+  },
+  "gamingWeekend": {
+    "newsHeadline": "[Ɓóýž, Ŵéļçóɱé ţó Ĝáɱíñĝ Ŵééķéñð!]",
+    "newsLead": "[Í'ɱ šó ĥáþþý ýóú áŕé ĥéŕé ƒóŕ ţĥíš ĝáɱíñĝ ŵééķéñð. Ýóú šĥóŵéð úþ, áñð ţĥáţ íš ŵĥáţ ţĥíš ŵĥóļé ţĥíñĝ íš áƀóúţ.]",
+    "newsPatchPitch": "[Ƒóŕ ţĥíš ĝáɱíñĝ ŵééķéñð ŵé áŕé ĝíʋíñĝ áŵáý þáţçĥéš ţĥŕóúĝĥ Ƒŕíéñð Áŵáŕðš. Ŵĥáţ ƀéţţéŕ þļáçé ţó ĥáñð ţĥéɱ óúţ ţĥáñ íñšíðé ţĥé ĝáɱé? Áŵáŕð óţĥéŕ þļáýéŕš, çóļļéçţ ŵĥáţ ýóú éáŕñ, áñð šĥóŵ ţĥéɱ óƒƒ.]",
+    "newsMissionTitle": "[Ýóúŕ ĝáɱíñĝ ŵééķéñð çĥéçķļíšţ]",
+    "newsStep1": "[Ɱáķé áñ áççóúñţ áñð šíĝñ íñ]",
+    "newsStep2": "[Ɋúéšţ, éẋþļóŕé, áñð ļéáŕñ ţĥé ŵóŕļð]",
+    "newsStep3": "[Ĝíʋé þáţçĥéš ţó óţĥéŕ þļáýéŕš ŵíţĥ Ƒŕíéñð Áŵáŕðš (Ɓóóķ óƒ Ðééðš)]",
+    "newsStep4": "[Ĥíţ ļéʋéļ 20]",
+    "newsStep5": "[Ŕúñ ðúñĝéóñš ŵíţĥ ýóúŕ çŕéŵ]",
+    "newsStep6": "[Þúšĥ ţó éñðĝáɱé áñð ƒļéẋ ŵĥáţ ýóú éáŕñéð]",
+    "newsRally": "[Ţĥé ŕéáļɱ íš óþéñ. Ĥýþé ýóúŕ Ɓóýž. Ļéţ'š ĜÓÓÓÓ!]",
+    "newsCharselectBlurb": "[Ĝáɱíñĝ ŵééķéñð íš ļíʋé. Þáţçĥéš ĝó óúţ ţĥŕóúĝĥ Ƒŕíéñð Áŵáŕðš. Ɋúéšţ, áŵáŕð ýóúŕ çŕéŵ, ĥíţ 20, ŕúñ ðúñĝéóñš, çĥášé éñðĝáɱé. Ļéţ'š ĜÓÓÓÓ!]",
+    "newsPageTitle": "[Ĝáɱíñĝ Ŵééķéñð]",
+    "newsPageDesc": "[Ŵéļçóɱé ţó óúŕ ĝáɱíñĝ ŵééķéñð: Ƒŕíéñð Áŵáŕð þáţçĥ ĝíʋéáŵáý, ɋúéšţš, ðúñĝéóñš, áñð ţĥé ŕóáð ţó éñðĝáɱé.]"
+  },
+  "friendAwards": {
+    "title": "[Ƒŕíéñð Áŵáŕðš Ĥáļļ]",
+    "desc": "[Éʋéŕý áççóúñţ óñ ţĥíš ŕéáļɱ áñð ţĥé áŵáŕðš þļáýéŕš ŕéçéíʋéð ƒŕóɱ óñé áñóţĥéŕ.]",
+    "accountCol": "[Áççóúñţ]",
+    "countCol": "[Áŵáŕðš]",
+    "awardsCol": "[Áŵáŕðš ŕéçéíʋéð]",
+    "empty": "[Ñó ƒŕíéñð áŵáŕðš ýéţ.]",
+    "unavailable": "[Ƒŕíéñð áŵáŕðš áŕé ñóţ áʋáíļáƀļé óñ ţĥíš ŕéáļɱ.]"
   },
   "wiki": {
     "title": "[Ĝáɱé Ŵíķí & Ĝúíðé]",

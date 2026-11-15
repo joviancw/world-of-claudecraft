@@ -1585,7 +1585,12 @@ export class GameServer {
     sendChatNotice: (session, text) => this.sendChatNotice(session, text),
   };
   private readonly presenceHost = presence.presenceHostFrom(this.flairHost, () => this.social);
-  readonly customAwards = createCustomAwards(this.flairHost, this.realmMotd.host, () => pool);
+  readonly customAwards = createCustomAwards(
+    this.flairHost,
+    this.realmMotd.host,
+    () => pool,
+    (id) => this.sessionByCharacterId(id),
+  );
   // Serializes every write of the single global Market blob (the 30s periodic
   // saveMarket/saveMail/saveRifts and the leave-path combined save). All
   // serialize whole-blob shared state; without a queue their transactions

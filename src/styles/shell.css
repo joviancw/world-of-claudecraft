@@ -1569,6 +1569,260 @@
     font-size: 11px;
     margin-right: 4px;
   }
+
+  .gaming-weekend-news .news-item-title {
+    color: #ffd86b;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+  .gaming-weekend-news .news-body p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-light);
+  }
+  .gaming-weekend-news .news-body__mission-title {
+    margin-top: 12px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    letter-spacing: 0.4px;
+    color: #ffd86b;
+    text-transform: uppercase;
+  }
+  .gaming-weekend-news .news-body__checklist {
+    margin: 8px 0 12px;
+    padding-left: 1.25rem;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--color-text-light);
+  }
+  .gaming-weekend-news .news-body__checklist li {
+    margin: 4px 0;
+  }
+  .gaming-weekend-news .news-body__checklist li::marker {
+    color: #ffb84d;
+  }
+  .gaming-weekend-news .news-body__rally {
+    margin-top: 14px;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    color: #ffe9a8;
+    text-align: center;
+  }
+  body.commerce-chrome-hidden .website-tools-item {
+    display: none !important;
+  }
+  body.commerce-chrome-hidden #account-change-email-form,
+  body.commerce-chrome-hidden #account-2fa {
+    display: none !important;
+  }
+  body.commerce-chrome-hidden #btn-charselect-woc-market,
+  body.commerce-chrome-hidden #charselect-woc-market,
+  body.commerce-chrome-hidden #cs-steam-group,
+  body.commerce-chrome-hidden #cs-epic-group {
+    display: none !important;
+  }
+
+  /* Friend Awards hall (home shell, beside High Scores) */
+  .fa-panel {
+    width: min(960px, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    max-width: 960px;
+  }
+  .fa-hall {
+    width: 100%;
+    margin-top: var(--spacing-sm);
+    text-align: left;
+  }
+  .fa-loading,
+  .fa-empty,
+  .fa-error {
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-align: center;
+    padding: 18px 0;
+  }
+  .fa-error {
+    color: #e08a7a;
+  }
+  .fa-row {
+    display: grid;
+    grid-template-columns: 48px minmax(120px, 180px) 72px 1fr;
+    align-items: start;
+    gap: 8px;
+    padding: 7px 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-text-light);
+    border-radius: var(--radius-sm);
+  }
+  .fa-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.035);
+  }
+  .fa-head {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--color-border-default);
+    background: none !important;
+    align-items: center;
+  }
+  .fa-rank {
+    text-align: center;
+    font-weight: 700;
+    color: var(--color-primary-dim);
+  }
+  .fa-row.fa-top .fa-rank {
+    color: #ffd86b;
+    text-shadow: 0 0 8px #f5c84366;
+  }
+  .fa-name {
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fa-count {
+    text-align: center;
+    color: var(--color-text-muted, #b9ac82);
+    font-variant-numeric: tabular-nums;
+  }
+  .fa-awards {
+    color: #e8dcc0;
+    line-height: 1.45;
+    min-width: 0;
+    word-break: break-word;
+  }
+  body.mobile-touch .fa-panel {
+    width: 100%;
+    max-width: 560px;
+    padding: var(--spacing-md);
+  }
+  body.mobile-touch .fa-hall {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+  body.mobile-touch .fa-head {
+    display: none;
+  }
+  body.mobile-touch .fa-row {
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-areas:
+      "rank name"
+      "rank count"
+      "rank awards";
+    align-items: start;
+    gap: 4px 10px;
+    padding: 10px 12px;
+    border: 1px solid rgba(78, 61, 29, 0.35);
+    background: rgba(255, 255, 255, 0.025);
+  }
+  body.mobile-touch .fa-rank {
+    grid-area: rank;
+    align-self: center;
+  }
+  body.mobile-touch .fa-name {
+    grid-area: name;
+    min-width: 0;
+  }
+  body.mobile-touch .fa-count {
+    grid-area: count;
+  }
+  body.mobile-touch .fa-awards {
+    grid-area: awards;
+  }
+  body.mobile-touch .fa-count,
+  body.mobile-touch .fa-awards {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    text-align: left;
+  }
+  body.mobile-touch .fa-count::before,
+  body.mobile-touch .fa-awards::before {
+    content: attr(data-label);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  @media (max-width: 680px) {
+    .fa-panel {
+      width: 100%;
+      max-width: 560px;
+      padding: var(--spacing-md);
+    }
+    .fa-hall {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+      overflow-x: hidden;
+    }
+    .fa-head {
+      display: none;
+    }
+    .fa-row {
+      grid-template-columns: 38px minmax(0, 1fr);
+      grid-template-areas:
+        "rank name"
+        "rank count"
+        "rank awards";
+      align-items: start;
+      gap: 4px 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(78, 61, 29, 0.35);
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .fa-rank {
+      grid-area: rank;
+      align-self: center;
+    }
+    .fa-name {
+      grid-area: name;
+      min-width: 0;
+    }
+    .fa-count {
+      grid-area: count;
+    }
+    .fa-awards {
+      grid-area: awards;
+    }
+    .fa-count,
+    .fa-awards {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--spacing-sm);
+      min-width: 0;
+      text-align: left;
+    }
+    .fa-count::before,
+    .fa-awards::before {
+      content: attr(data-label);
+      color: var(--color-primary-dim);
+      font-family: var(--font-heading);
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+  }
+
   body.mobile-touch .hs-panel {
     width: 100%;
     max-width: 560px;
@@ -3220,8 +3474,7 @@
       z-index: 70;
     }
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {
-      /* Matches the one-line desktop header height (logo row + its padding). */
-      border-top: 58px solid transparent;
+      border-top: var(--homepage-header-reserve, 58px) solid transparent;
     }
 
     /* The roster: the account chrome (realm / sort / wallet) is an in-flow
@@ -3243,6 +3496,13 @@
       border-bottom: 1px solid var(--color-border-default);
       padding: 10px 26px;
       margin: 0;
+    }
+    body.commerce-chrome-hidden:not(.mobile-touch)[data-start-panel='charselect-panel']
+      #charselect-panel.cs-wow
+      .cs-head {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      gap: 8px 18px;
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-title {
       margin: 0;

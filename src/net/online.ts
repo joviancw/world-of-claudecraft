@@ -219,6 +219,7 @@ import { applySelfCombatScalars } from './combat_scalar_wire';
 import { craftResultViewFromEvent } from './craft_result_mirror';
 import { decodeMobileStationCrafts, EMPTY_MST_CRAFTS } from './crafting_wire';
 import { customAwardsClient } from './custom_awards_client';
+import { customAwardTemplatesClient } from './custom_award_templates_client';
 import {
   type DesktopWalletBrowserAction,
   type DesktopWalletStatus,
@@ -456,7 +457,7 @@ export class Api {
     const data = await this.post('/api/register', {
       username,
       password,
-      email,
+      ...(email ? { email } : {}),
       turnstileToken,
       ref,
       nativeAttestation,
@@ -813,6 +814,18 @@ export class Api {
     }
   }
 
+  /** Public friend-awards hall for the home shell (private realm only). */
+  async friendAwardsHall(): Promise<{
+    enabled: boolean;
+    entries: import('../world_api/friend_awards_hall').FriendAwardsHallEntry[];
+  }> {
+    try {
+      return await this.get('/api/friend-awards/hall');
+    } catch {
+      return { enabled: false, entries: [] };
+    }
+  }
+
   // News & Updates feed for the home page, mirrored from GitHub Releases by the
   // server. Not realm-scoped — always read from the page's own origin.
   async releases(limit = 20): Promise<ReleaseEntry[]> {
@@ -1009,6 +1022,25 @@ export class Api {
       return data.dev_commands === true;
     } catch {
       return false;
+    }
+  }
+
+  // A private realm (PRIVATE_REALM=1): signup needs no email and sign-in skips
+  // the recovery-email prompt. Advert only; register/login bodies still enforce.
+  async privateRealmAdvert(): Promise<boolean> {
+    try {
+      const data = await this.statusDoc();
+      return data.private_realm === true;
+    } catch {
+      return false;
+    }
+  }
+
+  async realmStatusAdvert(): Promise<Record<string, unknown>> {
+    try {
+      return await this.statusDoc();
+    } catch {
+      return {};
     }
   }
 
@@ -1619,6 +1651,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private nativeLifecycleHandle: PluginListenerHandle | undefined;
   readonly characterId: number;
   readonly customAwards = customAwardsClient(() => ({
+    base: this.base,
+    token: this.token,
+    characterId: this.characterId,
+  }));
+  readonly customAwardTemplates = customAwardTemplatesClient(() => ({
     base: this.base,
     token: this.token,
     characterId: this.characterId,

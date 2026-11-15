@@ -1,6 +1,7 @@
 import { ITEMS } from '../sim/data';
 import type { InvSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { membershipGearClaimsAdvertised } from './private_realm_membership_gear';
 import type { BankInfo } from '../world_api/bank';
 import {
   type AccountBankStage,
@@ -269,12 +270,14 @@ function footer(deps: AccountBankDeps): HTMLElement {
   note.className = 'account-bank-note';
   note.textContent = t('hudChrome.bank.accountBound');
   foot.appendChild(note);
-  const claim = document.createElement('button');
-  claim.type = 'button';
-  claim.className = 'btn ui-btn account-bank-claim';
-  claim.textContent = t('hudChrome.bank.accountArmour');
-  claim.dataset.focusKey = 'account-armour';
-  claim.addEventListener('click', () => deps.world().claimMembershipArmour());
-  foot.appendChild(claim);
+  if (membershipGearClaimsAdvertised()) {
+    const claim = document.createElement('button');
+    claim.type = 'button';
+    claim.className = 'btn ui-btn account-bank-claim';
+    claim.textContent = t('hudChrome.bank.accountArmour');
+    claim.dataset.focusKey = 'account-armour';
+    claim.addEventListener('click', () => deps.world().claimMembershipArmour());
+    foot.appendChild(claim);
+  }
   return foot;
 }

@@ -9,6 +9,9 @@ export type { GuildRosterEntry, GuildRosterInfo } from '../sim/leaderboard_page'
 
 import type { GuildBoardCategory } from '../sim/guild_board_category';
 import type { PlayerClass } from '../sim/types';
+import type { FriendAwardLeaderboardEntry } from './friend_awards';
+
+export type { FriendAwardLeaderboardEntry } from './friend_awards';
 
 export type { GuildBoardCategory } from '../sim/guild_board_category';
 
@@ -41,6 +44,8 @@ export interface LeaderboardEntry {
   // passive display field, which stays '' offline).
   guild?: string;
   realm?: string; // present on the global (cross-realm) home-page board
+  /** Public friend-awarded titles (private realm); omitted when the board has none. */
+  friendAwards?: FriendAwardLeaderboardEntry[];
 }
 
 // One ranked row of the GUILD high-score board. A guild's score is the SUM of

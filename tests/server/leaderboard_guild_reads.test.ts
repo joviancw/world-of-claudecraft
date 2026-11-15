@@ -27,6 +27,7 @@ function result(rows: Record<string, unknown>[]): QueryResult {
 
 function xpRow(over: Record<string, unknown> = {}): Record<string, unknown> {
   return {
+    character_id: 9,
     name: 'Zyzz',
     class: 'warrior',
     level: 60,

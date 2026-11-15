@@ -12,6 +12,7 @@ export function createWebsiteViewNavigation(onPlayPanel: (panel: string) => void
     const views = [
       '#hero-view',
       '#highscores-view',
+      '#friend-awards-view',
       '#news-view',
       '#download-view',
       '#account-view',
@@ -24,6 +25,7 @@ export function createWebsiteViewNavigation(onPlayPanel: (panel: string) => void
     const navMap: Record<string, string> = {
       '#hero-view': 'nav-btn-play',
       '#highscores-view': 'nav-btn-highscores',
+      '#friend-awards-view': 'nav-btn-friend-awards',
       '#news-view': 'nav-btn-news',
       '#download-view': 'nav-btn-download',
       '#account-view': 'nav-btn-account',

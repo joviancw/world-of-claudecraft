@@ -34,7 +34,7 @@ function mountLanding(): void {
       <details id="community-menu"></details>
       <span class="js-stat-characters">…</span>
       <a id="wiki-link" href="#wiki">Wiki</a>
-      <a id="discord-link" href="https://discord.com/invite/worldofclaudecraft">Discord</a>
+      <a id="discord-link" href="https://discord.com/channels/953442947427348493/">Discord</a>
       <button type="button" id="btn-play"><span class="btn-play-label">Play</span><span class="btn-play-status btn-play-status-loading">Loading</span><span class="btn-play-status btn-play-status-starting">Starting</span></button>
       <span id="play-status" role="status" aria-live="polite"></span>
       <button type="button" id="nav-btn-login">Log in</button>

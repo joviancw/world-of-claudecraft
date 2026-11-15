@@ -160,6 +160,8 @@ export interface SocialWindowDeps {
   /** Open the chat bar pre-filled with a whisper to this player. */
   startWhisper(name: string): void;
   openReferralCards?(): void;
+  /** When false, the stamp-card entry stays out of the social window. */
+  referralCardsAvailable?(): boolean;
   // The player menus a row right-click (or a touch long-press) can open; which one
   // is social_row_menu_core's call: your own unit frame's menu, another player's
   // unit-frame menu (pid-keyed), or the by-name menu a chat name opens.
@@ -747,7 +749,9 @@ export class SocialWindow {
           selected: tab,
         }),
       ) +
-      (online && this.deps.openReferralCards
+      (online &&
+      this.deps.openReferralCards &&
+      this.deps.referralCardsAvailable?.() !== false
         ? `<div class="soc-referral-entry"><button type="button" class="ui-btn" data-open-referral-cards>${svgIcon('cards')}${esc(t('referralCards.title'))}</button></div>`
         : '') +
       `<div class="soc-body" id="soc-body-panel" role="tabpanel"></div>` +

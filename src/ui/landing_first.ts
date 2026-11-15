@@ -40,6 +40,7 @@ import { liftBootSplashWhenReady } from './boot_splash';
 import { BOOT_SPLASH_OWNED_EVENT } from './boot_splash_core';
 import { LANDING_PHONE_TOUCH_QUERY, landingTouchInterface } from './landing_first_core';
 import { loadProjectStats, type ProjectStats } from './project_stats';
+import { syncCommerceChromeFromPrivateRealmAdvert } from './commerce_chrome_policy';
 import { syncSteamWishlistVisibility } from './steam_wishlist';
 import { hydrateIcons } from './ui_icons';
 
@@ -377,6 +378,16 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
   void loadProjectStats(fetchProjectStats);
   // Landing mode only runs on the website, which has no Steam bridge to ask.
   void syncSteamWishlistVisibility(false);
+  void syncCommerceChromeFromPrivateRealmAdvert(async () => {
+    try {
+      const res = await fetch(apiUrl('/api/status'), { signal: AbortSignal.timeout(3000) });
+      if (!res.ok) return false;
+      const data = (await res.json()) as { private_realm?: boolean };
+      return data.private_realm === true;
+    } catch {
+      return false;
+    }
+  });
   captureFirstTouch();
   startSitePresence('home');
   trackCommunityLinkClicks();

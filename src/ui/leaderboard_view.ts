@@ -19,7 +19,7 @@
 import { CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { virtualLevel } from '../sim/types';
-import type { LeaderboardPage } from '../world_api';
+import type { FriendAwardLeaderboardEntry, LeaderboardPage } from '../world_api';
 
 /** The viewer's identity + lifetime XP, used to me-flag rows and build the
  *  off-page "your standing" row. */
@@ -54,6 +54,8 @@ export interface LeaderboardRow {
    *  beside the name in the `<Guild>` treatment (never localized: it is a
    *  player-authored display name). */
   guild: string | null;
+  /** Public friend-awarded titles when the server includes them (private realm). */
+  friendAwards?: readonly FriendAwardLeaderboardEntry[];
   me: boolean;
 }
 
@@ -132,6 +134,7 @@ export function buildLeaderboardView(input: LeaderboardInput): LeaderboardView {
     // Normalized to null for the two "unguilded" wire shapes (absent, or the
     // empty string the passive display field carries offline).
     guild: e.guild ? e.guild : null,
+    friendAwards: e.friendAwards,
     me: e.name === viewer.name,
   }));
   const onPage = rows.some((r) => r.me);

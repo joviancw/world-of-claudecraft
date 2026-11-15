@@ -156,6 +156,14 @@ describe('store promo card', () => {
     },
   );
 
+  it('exposes gaming-weekend awards promo copy that opens the Book of Deeds', async () => {
+    const { privateRealmAwardsPromoLabels } = await import('../src/ui/private_realm_awards_promo');
+    const labels = privateRealmAwardsPromoLabels();
+    expect(labels.title).toContain('Gaming weekend');
+    expect(labels.title).toContain('patches under the awards');
+    expect(labels.cta).toContain('Book of Deeds');
+  });
+
   it('is limited to the desktop web interface with independent platform guards', () => {
     expect(shouldShowStorePromo({ nativeApp: false, desktopApp: false, mobileTouch: false })).toBe(
       true,

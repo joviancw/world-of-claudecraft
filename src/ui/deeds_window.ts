@@ -18,6 +18,16 @@ import {
   CustomAwardsSection,
 } from './custom_awards_section';
 import {
+  CUSTOM_AWARD_TEMPLATES_SLOT_CLASS,
+  CUSTOM_AWARD_TEMPLATES_SLOT_HTML,
+  CustomAwardTemplatesSection,
+} from './custom_award_templates_section';
+import {
+  CUSTOM_AWARDS_GIVEN_SLOT_CLASS,
+  CUSTOM_AWARDS_GIVEN_SLOT_HTML,
+  CustomAwardsGivenSection,
+} from './custom_awards_given_section';
+import {
   borderAccent,
   DEED_HERALDRY_ATTR,
   DEED_HERALDRY_MOTIF_ATTR,
@@ -138,6 +148,8 @@ export interface DeedsWindowDeps extends PainterHostPresentation {
   restoreFocus(target: HTMLElement | null): void;
   /** The watch set changed: repaint the HUD deed tracker now. */
   onWatchChanged(): void;
+  /** A template was issued successfully: HUD celebration and chat feedback. */
+  onCustomAwardIssued?(title: string, recipient: string): void;
 }
 
 export class DeedsWindow {
@@ -147,6 +159,14 @@ export class DeedsWindow {
   private readonly customAwards = new CustomAwardsSection(
     () => this.deps.world().customAwards,
     () => this.deps.world(),
+  );
+  private readonly customAwardTemplates = new CustomAwardTemplatesSection(
+    () => this.deps.world().customAwardTemplates,
+    () => this.customAwardsGiven.refresh(),
+    (title, recipient) => this.deps.onCustomAwardIssued?.(title, recipient),
+  );
+  private readonly customAwardsGiven = new CustomAwardsGivenSection(
+    () => this.deps.world().customAwards,
   );
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
@@ -203,6 +223,8 @@ export class DeedsWindow {
     this.fetchRarity();
     this.fetchRecent();
     this.customAwards.refresh();
+    this.customAwardTemplates.refresh();
+    this.customAwardsGiven.refresh();
     this.render();
     this.deps.root().style.display = 'flex';
     // A jump-to-deed open already put the reading position on the landed card
@@ -362,6 +384,13 @@ export class DeedsWindow {
     this.render();
   }
 
+  /** Refresh custom-award shelves after an issue (giver history and templates). */
+  refreshCustomAwards(): void {
+    this.customAwardsGiven.refresh();
+    this.customAwards.refresh();
+    if (this.opened) this.render();
+  }
+
   render(): void {
     const el = this.deps.root();
     if (!this.opened) return;
@@ -396,6 +425,8 @@ export class DeedsWindow {
       this.filterBarHtml();
 
     this.wire(el);
+    this.customAwardTemplates.mount(el.querySelector(`.${CUSTOM_AWARD_TEMPLATES_SLOT_CLASS}`));
+    this.customAwardsGiven.mount(el.querySelector(`.${CUSTOM_AWARDS_GIVEN_SLOT_CLASS}`));
     this.customAwards.mount(el.querySelector(`.${CUSTOM_AWARDS_SLOT_CLASS}`));
     const scroll = el.querySelector('.deeds-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
@@ -738,6 +769,8 @@ export class DeedsWindow {
         decorate: (id, label) => this.borderOptionInner(id, label),
       }) +
       `<div class="deeds-border-preview-slot">${this.borderPreviewHtml(activeBorder)}</div>` +
+      CUSTOM_AWARD_TEMPLATES_SLOT_HTML +
+      CUSTOM_AWARDS_GIVEN_SLOT_HTML +
       CUSTOM_AWARDS_SLOT_HTML
     );
   }

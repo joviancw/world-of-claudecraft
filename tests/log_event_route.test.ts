@@ -50,6 +50,15 @@ describe('logEventCue: the sounds and banners a log line also fires', () => {
     expect(logEventCue('You receive loot: Linen Cloth.')).toEqual({ sound: null, banner: null });
   });
 
+  it('plays the achievement sound for a custom award announcement', () => {
+    const text =
+      'ACHIEVEMENT UNLOCKED! Bob has earned "Hero"! Awarded by Ann.';
+    expect(logEventCue(text)).toEqual({
+      sound: 'achievement',
+      banner: 'hud.system.customAwardBanner',
+    });
+  });
+
   it('shows the Moonbridge banner beside its chat line as the Colossus falls', () => {
     const gate = DROWNED_TEMPLE_GATES.find((g) => g.id === 'moonbridge');
     expect(gate?.openText).toBe('Moonlight gathers over the lagoon and hardens into a bridge.');

@@ -13,6 +13,7 @@ export function createReferralCardsHud(deps: {
   visibilityChanged(): void;
   snapshotChanged(): void;
   playReward?(): void;
+  suppressed?(): boolean;
 }): ReferralCardsController {
   const root = document.createElement('div');
   root.classList.add('panel');
@@ -80,5 +81,6 @@ export function createReferralCardsHud(deps: {
       opener = null;
       deps.visibilityChanged();
     },
+    suppressed: deps.suppressed,
   });
 }

@@ -72,12 +72,9 @@ describe('draftCustomAward', () => {
     });
   });
 
-  it('refuses a blocked word in the title or description', () => {
-    expect(draftCustomAward(award('Total shit'), 'Ann', LIMITS)).toEqual({
-      ok: false,
-      notice: CUSTOM_AWARD_NOTICES.offensive,
-    });
-    expect(draftCustomAward(award('Hero', 'what a fucking legend'), 'Ann', LIMITS).ok).toBe(false);
+  it('does not apply the global name profanity filter to award text', () => {
+    expect(draftCustomAward(award('Total shit'), 'Ann', LIMITS).ok).toBe(true);
+    expect(draftCustomAward(award('Hero', 'what a fucking legend'), 'Ann', LIMITS).ok).toBe(true);
   });
 
   it('refuses an empty title after cleaning', () => {
@@ -133,6 +130,12 @@ class FakeStore implements CustomAwardsStore {
     return this.result;
   }
   async listFor() {
+    return [];
+  }
+  async listGivenBy() {
+    return [];
+  }
+  async listPublicForRecipientName() {
     return [];
   }
   async setHidden() {
@@ -216,22 +219,49 @@ describe('CustomAwards service', () => {
     expect(h.awarded).toEqual([]);
   });
 
-  it('tells only the recipient when global announcements are off', async () => {
-    const h = harness({ ...PRIVATE_REALM_DEFAULTS.achievements, globalAnnouncements: false });
-    await h.awards.run(h.ann, parseCustomAwardCommand('/award Bob "Hero"')!);
-    expect(h.lines(h.bob)).toEqual([customAwardAnnouncement('Bob', 'Hero', 'Ann')]);
-    expect(h.lines(h.cy)).toEqual([]);
+  it('delivers the giver notice to a live session when the grant session is REST-shaped', async () => {
+    const h = harness();
+    const restSession = { characterId: 1, accountId: 10, name: 'Ann' };
+    const awards = new CustomAwards<Sess>(
+      { consumeCommandLane: () => true },
+      {
+        sessions: () => [h.ann, h.bob],
+        sendRaw: (s, payload) => s.sent.push(payload),
+        sessionForCharacter: (id) => (id === 1 ? h.ann : null),
+      },
+      h.store,
+      () => PRIVATE_REALM_DEFAULTS.achievements,
+    );
+    await awards.finishGrant(restSession, 'Bob', 'Hero', 'nice', 'rest:1');
+    expect(h.lines(h.ann)).toEqual([
+      'You awarded "Hero" to Bob.',
+      customAwardAnnouncement('Bob', 'Hero', 'Ann'),
+    ]);
   });
 
-  it('meters a burst: one award in flight per account', () => {
+  it('always announces realm-wide even when globalAnnouncements is off', async () => {
+    const h = harness({ ...PRIVATE_REALM_DEFAULTS.achievements, globalAnnouncements: false });
+    await h.awards.run(h.ann, parseCustomAwardCommand('/award Bob "Hero"')!);
+    const line = customAwardAnnouncement('Bob', 'Hero', 'Ann');
+    expect(h.lines(h.bob)).toEqual([line]);
+    expect(h.lines(h.cy)).toEqual([line]);
+  });
+
+  it('rejects a second grant while the first is still in flight', async () => {
     const h = harness();
-    expect(h.awards.handleChat(h.ann, '/award Bob "One"', 10)).toBe(true);
-    expect(h.awards.handleChat(h.ann, '/award Bob "Two"', 10.1)).toBe(true);
-    return new Promise<void>((resolve) =>
-      setTimeout(() => {
-        expect(h.store.inserts.map((i) => i.title)).toEqual(['One']);
-        resolve();
-      }, 10),
-    );
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const baseInsert = h.store.insert.bind(h.store);
+    h.store.insert = async (a) => {
+      await gate;
+      return baseInsert(a);
+    };
+    const first = h.awards.finishGrant(h.ann, 'Bob', 'One', '', 'test');
+    expect(await h.awards.finishGrant(h.ann, 'Bob', 'Two', '', 'test')).toBe('busy');
+    release();
+    await first;
+    expect(h.store.inserts.map((i) => i.title)).toEqual(['One']);
   });
 });

@@ -8,6 +8,7 @@ import {
   statSync,
 } from 'node:fs';
 import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
+import { contentScreeningEnabled } from './content_screening_policy';
 
 const SCRYPT_N = 16384,
   SCRYPT_R = 8,
@@ -370,6 +371,7 @@ export function offensiveUsername(u: unknown): boolean {
 }
 
 export function offensiveName(u: unknown): boolean {
+  if (!contentScreeningEnabled()) return false;
   if (typeof u !== 'string') return false;
   const normalized = normalizedUsernameForCensorship(u);
   // The matcher's second pass exists for spellings only the confusable fold

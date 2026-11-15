@@ -4944,6 +4944,17 @@
   .lb-row-players {
     grid-template-columns: 44px minmax(0, 1.9fr) 44px 48px 96px minmax(0, 1fr);
   }
+  .lb-row-players--friend-awards {
+    grid-template-columns: 44px minmax(0, 1.5fr) 44px 48px 96px minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+  .lb-friend-awards {
+    color: var(--gold-dim);
+    font-size: 11px;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
   }
@@ -11743,6 +11754,44 @@
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+  }
+  .deeds-custom-award-status-ok {
+    font-size: 12px;
+    color: var(--color-good, #7cfc7c);
+    padding: 4px 2px 0;
+  }
+  .deeds-custom-award-templates-hint {
+    font-size: 11px;
+    color: var(--gold-dim);
+    padding: 0 2px 4px;
+  }
+  .deeds-custom-award-template-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 2px 8px;
+  }
+  .deeds-custom-award-template-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+    padding: 5px 7px;
+    border-radius: 4px;
+    border: 1px solid #4a3d26;
+    background: #0c0a07;
+    color: var(--color-text-overlay);
+  }
+  .deeds-custom-award-template-desc {
+    min-height: 3.2em;
+    resize: vertical;
+  }
+  .inspect-custom-awards {
+    margin: 8px 0;
+  }
+  .inspect-custom-award-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
   /* Not adopted onto .ui-btn: deed_border_accent.test.ts pins this recipe by
      literal (it is the one place the border-accent palette is allowed to live),

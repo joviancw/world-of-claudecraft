@@ -57,7 +57,7 @@ export class ReferralCardsController {
   }
 
   open(): void {
-    if (this.destroyed) return;
+    if (this.destroyed || this.host.suppressed?.()) return;
     if (!this.openState) this.host.beforeOpen?.();
     this.openState = true;
     this.trackCooldown(this.host.getSnapshot());
@@ -182,8 +182,9 @@ export class ReferralCardsController {
       count > 0
         ? referralText('readyCount', { count: formatNumber(count) })
         : referralText('launcher');
+    const suppressed = this.host.suppressed?.() === true;
     for (const launcher of [this.host.launcher, ...(this.host.extraLaunchers ?? [])]) {
-      launcher.hidden = snapshot === null;
+      launcher.hidden = suppressed || snapshot === null;
       launcher.setAttribute('aria-expanded', String(this.openState));
       launcher.classList.toggle('referral-reward-ready', count > 0);
       launcher.setAttribute('aria-label', label);

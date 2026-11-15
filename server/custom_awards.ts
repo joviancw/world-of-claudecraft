@@ -22,6 +22,7 @@ import {
   draftCustomAward,
   parseCustomAwardCommand,
 } from './custom_award_command';
+import { type CustomAwardGrantResult, grantCustomAward } from './custom_award_grant';
 import { CustomAwardTitles, type CustomTitleSim } from './custom_award_titles';
 import { type CustomAwardsStore, customAwardsStore } from './custom_awards_db';
 import { logger } from './http/logger';
@@ -45,6 +46,8 @@ export interface CustomAwardLane<S> {
 export interface CustomAwardBroadcast<S> {
   sessions(): Iterable<S>;
   sendRaw(session: S, payload: string): void;
+  /** When a grant uses a REST-shaped session, deliver notices to the live socket. */
+  sessionForCharacter?(characterId: number): S | null | undefined;
 }
 
 /** A recipient changed what they own (a new award). */
@@ -122,38 +125,82 @@ export class CustomAwards<S extends CustomAwardSession> {
     if (cmd.kind === 'usage') return this.notice(session, CUSTOM_AWARD_NOTICES.usage, ERROR_COLOR);
     const draft = draftCustomAward(cmd, session.name, rules);
     if (!draft.ok) return this.notice(session, draft.notice, ERROR_COLOR);
-    const recipient = await this.store.findRecipient(draft.target);
-    if (!recipient) return this.notice(session, CUSTOM_AWARD_NOTICES.notFound, ERROR_COLOR);
-    if (recipient.characterId === session.characterId || recipient.accountId === session.accountId)
-      return this.notice(session, CUSTOM_AWARD_NOTICES.self, ERROR_COLOR);
-    const result = await this.store.insert({
-      giverCharacterId: session.characterId,
-      giverName: session.name,
-      recipientCharacterId: recipient.characterId,
-      title: draft.title,
-      titleKey: draft.titleKey,
-      description: draft.description,
-      dailyCap: rules.dailyAwardCap,
-    });
-    if (result.kind === 'capped')
-      return this.notice(session, customAwardDailyCap(rules.dailyAwardCap), ERROR_COLOR);
-    if (result.kind === 'duplicate')
-      return this.notice(session, CUSTOM_AWARD_NOTICES.duplicate, ERROR_COLOR);
-    logger.info(
-      {
-        awardId: result.id,
+    await this.finishGrant(
+      session,
+      draft.target,
+      draft.title,
+      draft.description,
+      `chat:${session.characterId}`,
+    );
+  }
+
+  /** Issue a saved template or a REST/UI grant. */
+  async finishGrant(
+    session: S,
+    recipientName: string,
+    title: string,
+    description: string,
+    laneKey: string,
+  ): Promise<CustomAwardGrantResult | 'busy' | 'disabled'> {
+    const rules = this.rules();
+    if (!rules) return 'disabled';
+    if (this.inFlight.has(session.accountId)) return 'busy';
+    this.inFlight.add(session.accountId);
+    try {
+      const result = await grantCustomAward(this.store, {
         giverCharacterId: session.characterId,
-        recipientCharacterId: recipient.characterId,
-      },
-      'custom award granted',
-    );
-    this.notice(session, customAwardSent(draft.title, recipient.name), NOTICE_COLOR);
-    this.announce(
-      recipient,
-      customAwardAnnouncement(recipient.name, draft.title, session.name),
-      rules.globalAnnouncements,
-    );
-    for (const listener of this.listeners) listener(recipient.characterId);
+        giverAccountId: session.accountId,
+        giverName: session.name,
+        recipientName,
+        title,
+        description,
+        limits: rules,
+        dailyCap: rules.dailyAwardCap,
+      });
+      if (result.kind === 'not_found') {
+        this.notice(session, CUSTOM_AWARD_NOTICES.notFound, ERROR_COLOR);
+        return result;
+      }
+      if (result.kind === 'self') {
+        this.notice(session, CUSTOM_AWARD_NOTICES.self, ERROR_COLOR);
+        return result;
+      }
+      if (result.kind === 'capped') {
+        this.notice(session, customAwardDailyCap(rules.dailyAwardCap), ERROR_COLOR);
+        return result;
+      }
+      if (result.kind === 'duplicate') {
+        this.notice(session, CUSTOM_AWARD_NOTICES.duplicate, ERROR_COLOR);
+        return result;
+      }
+      if (result.kind === 'invalid') {
+        this.notice(session, CUSTOM_AWARD_NOTICES.failed, ERROR_COLOR);
+        return result;
+      }
+      logger.info(
+        {
+          awardId: result.awardId,
+          giverCharacterId: session.characterId,
+          recipientCharacterId: result.recipientCharacterId,
+          lane: laneKey,
+        },
+        'custom award granted',
+      );
+      this.deliverLog(session, customAwardSent(title, result.recipientName), NOTICE_COLOR);
+      this.announce(
+        { characterId: result.recipientCharacterId },
+        customAwardAnnouncement(result.recipientName, title, session.name),
+        true,
+      );
+      for (const listener of this.listeners) listener(result.recipientCharacterId);
+      return result;
+    } catch (err) {
+      logger.error({ err, lane: laneKey }, 'custom award failed');
+      this.notice(session, CUSTOM_AWARD_NOTICES.failed, ERROR_COLOR);
+      return { kind: 'invalid' };
+    } finally {
+      this.inFlight.delete(session.accountId);
+    }
   }
 
   // Serialize-once fan-out: the same payload string goes to every session.
@@ -166,7 +213,13 @@ export class CustomAwards<S extends CustomAwardSession> {
   }
 
   private notice(session: S, text: string, color: string): void {
-    this.broadcast.sendRaw(session, logPayload(text, color));
+    this.deliverLog(session, text, color);
+  }
+
+  private deliverLog(session: S, text: string, color: string): void {
+    const payload = logPayload(text, color);
+    const live = this.broadcast.sessionForCharacter?.(session.characterId) ?? session;
+    this.broadcast.sendRaw(live, payload);
   }
 }
 
@@ -176,6 +229,10 @@ export function createCustomAwards<S extends CustomAwardSession>(
   lane: CustomAwardLane<S>,
   broadcast: CustomAwardBroadcast<S>,
   getPool: () => Pool,
+  sessionForCharacter?: (characterId: number) => S | null | undefined,
 ): CustomAwards<S> {
-  return new CustomAwards(lane, broadcast, customAwardsStore(getPool, REALM));
+  const host: CustomAwardBroadcast<S> = sessionForCharacter
+    ? { ...broadcast, sessionForCharacter }
+    : broadcast;
+  return new CustomAwards(lane, host, customAwardsStore(getPool, REALM));
 }

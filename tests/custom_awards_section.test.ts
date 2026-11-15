@@ -53,6 +53,8 @@ function stubSource(list: CustomAwardView[] | null, ok = true) {
   const calls: string[] = [];
   const source: CustomAwardsSource = {
     list: async () => list,
+    listGiven: async () => [],
+    listPublicForName: async () => [],
     setHidden: async (id, hidden) => {
       calls.push(`hide:${id}:${hidden}`);
       return ok;

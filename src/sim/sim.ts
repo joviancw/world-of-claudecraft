@@ -4795,6 +4795,7 @@ export class Sim {
   }
   // Player-awarded achievements are a private-realm SERVER feature: none offline.
   readonly customAwards: import('../world_api').CustomAwardsSource | null = null;
+  readonly customAwardTemplates: import('../world_api').CustomAwardTemplatesSource | null = null;
   raidLockouts(): import('../world_api').RaidLockout[] {
     const now = this.lockoutNowMs();
     const out: import('../world_api').RaidLockout[] = [];
@@ -6007,7 +6008,10 @@ export class Sim {
         // positive transition needs a dirty mark (a resting player must not
         // stay perpetually dirty for the tick-tail evaluator).
         const wasUnrested = meta.restedXp === 0;
-        updateRested(p, meta, this.worldContent.props.buildings);
+        updateRested(p, meta, this.worldContent.props.buildings, {
+          alwaysAccrueOutOfCombat:
+            this.cfg.privateRealm?.leveling.alwaysRestedAccrual === true,
+        });
         if (wasUnrested && meta.restedXp > 0) deedsMod.markDeedsDirty(this.ctx, p.id);
         if (meta.pendingGatherGrants.length > 0) {
           drainGatheringGrants(meta);

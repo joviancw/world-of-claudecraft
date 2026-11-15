@@ -69,6 +69,108 @@ WHERE a.recipient_character_id = $1 AND NOT a.rejected
 ORDER BY a.created_at DESC, a.id DESC
 LIMIT 200`;
 
+export const LIST_GIVER_CUSTOM_AWARDS_SQL = `
+SELECT a.id, a.title, a.description, a.created_at, r.name AS recipient_name
+FROM custom_awards a
+JOIN characters r ON r.id = a.recipient_character_id
+WHERE a.giver_character_id = $1 AND NOT a.rejected
+ORDER BY a.created_at DESC, a.id DESC
+LIMIT 200`;
+
+export const LIST_PUBLIC_CUSTOM_AWARDS_SQL = `
+SELECT a.id, a.title, a.description, a.created_at,
+       COALESCE(g.name, a.giver_name) AS giver_name
+FROM custom_awards a
+LEFT JOIN characters g ON g.id = a.giver_character_id
+JOIN characters r ON r.id = a.recipient_character_id
+WHERE r.realm = $1 AND lower(r.name) = lower($2) AND NOT a.rejected AND NOT a.hidden
+ORDER BY a.created_at DESC, a.id DESC
+LIMIT 50`;
+
+/** Visible friend awards for many leaderboard recipients (one round trip). */
+export const LIST_PUBLIC_CUSTOM_AWARDS_FOR_RECIPIENTS_SQL = `
+SELECT a.recipient_character_id, a.title,
+       COALESCE(g.name, a.giver_name) AS giver_name
+FROM custom_awards a
+LEFT JOIN characters g ON g.id = a.giver_character_id
+WHERE a.recipient_character_id = ANY($1::int[])
+  AND NOT a.rejected AND NOT a.hidden
+ORDER BY a.recipient_character_id, a.created_at DESC, a.id DESC`;
+
+export const LEADERBOARD_FRIEND_AWARDS_PER_CHARACTER = 24;
+
+/** Every visible friend award on this realm (for the public hall page). */
+export const LIST_REALM_FRIEND_AWARDS_HALL_SQL = `
+SELECT r.account_id, r.name AS recipient_name,
+       a.title, COALESCE(g.name, a.giver_name) AS giver_name
+FROM custom_awards a
+JOIN characters r ON r.id = a.recipient_character_id
+LEFT JOIN characters g ON g.id = a.giver_character_id
+WHERE r.realm = $1 AND NOT a.rejected AND NOT a.hidden
+ORDER BY r.account_id, r.name, a.created_at DESC, a.id DESC
+LIMIT $2`;
+
+export const FRIEND_AWARDS_HALL_ROW_LIMIT = 5000;
+
+export interface FriendAwardsHallDbRow {
+  accountId: number;
+  recipientName: string;
+  title: string;
+  giverName: string;
+}
+
+export async function listRealmFriendAwardsHallRows(
+  getPool: () => Pool,
+  realm: string,
+  rowLimit = FRIEND_AWARDS_HALL_ROW_LIMIT,
+): Promise<FriendAwardsHallDbRow[]> {
+  const limit = Math.max(1, Math.min(rowLimit, FRIEND_AWARDS_HALL_ROW_LIMIT));
+  const { rows } = await getPool().query(LIST_REALM_FRIEND_AWARDS_HALL_SQL, [realm, limit]);
+  const out: FriendAwardsHallDbRow[] = [];
+  for (const row of rows) {
+    const accountId = Number(row.account_id);
+    if (!Number.isSafeInteger(accountId) || accountId <= 0) continue;
+    const recipientName = typeof row.recipient_name === 'string' ? row.recipient_name : '';
+    const title = typeof row.title === 'string' ? row.title : '';
+    const giverName = typeof row.giver_name === 'string' ? row.giver_name : '';
+    if (!recipientName || !title) continue;
+    out.push({ accountId, recipientName, title, giverName });
+  }
+  return out;
+}
+
+export interface FriendAwardLeaderboardRow {
+  title: string;
+  giverName: string;
+}
+
+export async function listPublicCustomAwardsForRecipients(
+  getPool: () => Pool,
+  recipientCharacterIds: readonly number[],
+  perCharacter = LEADERBOARD_FRIEND_AWARDS_PER_CHARACTER,
+): Promise<Map<number, FriendAwardLeaderboardRow[]>> {
+  const ids = recipientCharacterIds.filter((id) => Number.isInteger(id) && id > 0);
+  const out = new Map<number, FriendAwardLeaderboardRow[]>();
+  if (ids.length === 0) return out;
+  const { rows } = await getPool().query(LIST_PUBLIC_CUSTOM_AWARDS_FOR_RECIPIENTS_SQL, [ids]);
+  const cap = Math.max(1, perCharacter);
+  for (const row of rows) {
+    const id = Number(row.recipient_character_id);
+    if (!Number.isInteger(id)) continue;
+    let list = out.get(id);
+    if (!list) {
+      list = [];
+      out.set(id, list);
+    }
+    if (list.length >= cap) continue;
+    const title = typeof row.title === 'string' ? row.title : '';
+    const giverName = typeof row.giver_name === 'string' ? row.giver_name : '';
+    if (!title) continue;
+    list.push({ title, giverName });
+  }
+  return out;
+}
+
 export const SET_CUSTOM_AWARD_HIDDEN_SQL = `
 UPDATE custom_awards SET hidden = $3
 WHERE id = $1 AND recipient_character_id = $2 AND NOT rejected`;
@@ -107,10 +209,20 @@ export interface CustomAwardRow {
   createdAt: number;
 }
 
+export interface CustomAwardGivenRow {
+  id: number;
+  title: string;
+  description: string;
+  recipientName: string;
+  createdAt: number;
+}
+
 export interface CustomAwardsStore {
   findRecipient(name: string): Promise<AwardRecipient | null>;
   insert(award: CustomAwardInsert): Promise<CustomAwardInsertResult>;
   listFor(recipientCharacterId: number): Promise<CustomAwardRow[]>;
+  listGivenBy(giverCharacterId: number): Promise<CustomAwardGivenRow[]>;
+  listPublicForRecipientName(recipientName: string): Promise<CustomAwardRow[]>;
   setHidden(recipientCharacterId: number, awardId: number, hidden: boolean): Promise<boolean>;
   reject(recipientCharacterId: number, awardId: number): Promise<boolean>;
 }
@@ -149,6 +261,30 @@ export function customAwardsStore(getPool: () => Pool, realm: string): CustomAwa
         description: r.description,
         giverName: r.giver_name,
         hidden: r.hidden === true,
+        createdAt: new Date(r.created_at).getTime(),
+      }));
+    },
+    async listGivenBy(giverCharacterId) {
+      const { rows } = await getPool().query(LIST_GIVER_CUSTOM_AWARDS_SQL, [giverCharacterId]);
+      return rows.map((r) => ({
+        id: Number(r.id),
+        title: r.title,
+        description: r.description,
+        recipientName: r.recipient_name,
+        createdAt: new Date(r.created_at).getTime(),
+      }));
+    },
+    async listPublicForRecipientName(recipientName) {
+      const { rows } = await getPool().query(LIST_PUBLIC_CUSTOM_AWARDS_SQL, [
+        realm,
+        recipientName.trim(),
+      ]);
+      return rows.map((r) => ({
+        id: Number(r.id),
+        title: r.title,
+        description: r.description,
+        giverName: r.giver_name,
+        hidden: false,
         createdAt: new Date(r.created_at).getTime(),
       }));
     },

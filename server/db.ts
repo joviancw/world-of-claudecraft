@@ -73,6 +73,7 @@ import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import { CRAFT_ROLL_EVENTS_SCHEMA } from './craft_roll_events_db';
 import { CUSTOM_AWARDS_SCHEMA } from './custom_awards_db';
+import { CUSTOM_AWARD_TEMPLATES_SCHEMA } from './custom_award_templates_db';
 import { cancelDetachedBackend } from './db_backend_cancel';
 import { dbConnectionBudgetWarning } from './db_connection_budget';
 import type { RankedDeedsAccount } from './deeds_board';
@@ -1328,6 +1329,7 @@ export async function ensureSchema(): Promise<void> {
     // Private-realm player awards (server/custom_awards_db.ts): FK-references
     // characters(id), so after SCHEMA. Keep-forever by design (see the module).
     await client.query(CUSTOM_AWARDS_SCHEMA);
+    await client.query(CUSTOM_AWARD_TEMPLATES_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -3721,6 +3723,7 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
 // ---------------------------------------------------------------------------
 
 export interface LifetimeXpLeaderRow {
+  characterId: number;
   name: string;
   class: PlayerClass;
   level: number;
@@ -3763,7 +3766,7 @@ export async function topLifetimeXp(
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     opts.global
       ? query(
-          `SELECT name, class, level, realm,
+          `SELECT id AS character_id, name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
                 state->>'activeTitle' AS active_title,
@@ -3778,7 +3781,7 @@ export async function topLifetimeXp(
           [cap],
         )
       : query(
-          `SELECT name, class, level, realm,
+          `SELECT id AS character_id, name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
                 state->>'activeTitle' AS active_title,
@@ -3794,6 +3797,7 @@ export async function topLifetimeXp(
         ),
   );
   return res.rows.map((r) => ({
+    characterId: Number(r.character_id),
     name: r.name,
     class: r.class,
     level: r.level,

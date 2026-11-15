@@ -272,7 +272,7 @@ describe('GET /api/discord (status)', () => {
     expect(data.linked).toBe(false);
     expect(data.points).toBe(0);
     expect(data.statusTier).toBe(0);
-    expect(data.inviteUrl).toBe('https://discord.com/invite/worldofclaudecraft');
+    expect(data.inviteUrl).toBe('https://discord.com/channels/953442947427348493/');
   });
 
   it('reports linked status, points and derived tier', async () => {

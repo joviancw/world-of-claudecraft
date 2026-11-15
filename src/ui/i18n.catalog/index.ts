@@ -122,6 +122,7 @@ export const en = {
     serverRequirement: 'Server cheats still require ALLOW_DEV_COMMANDS=1.',
     invalidValues: 'Choose valid values before running this command.',
     sent: 'Sent: {command}',
+    sentLocal: 'Ran: {action}',
     run: 'Run',
     fields: {
       level: 'Level',
@@ -241,6 +242,10 @@ export const en = {
         description: 'Raise the announced hill right away.',
       },
       hillend: { label: 'End hill', description: 'Make the current hill fall now.' },
+      customAwardRevealPreview: {
+        label: 'Preview friend award reveal',
+        description: 'Play the five-second achievement reveal overlay with sample copy.',
+      },
     },
   },
   game: gameStrings,
@@ -305,6 +310,7 @@ export const en = {
     stats: 'Statistics',
     about: 'About',
     highscores: 'High Scores',
+    friendAwards: 'Friend Awards',
     wiki: 'Wiki',
     news: 'News',
     download: 'Download',
@@ -348,6 +354,35 @@ export const en = {
   highscores: {
     title: 'High Scores Leaderboard',
     desc: "Track the world's greatest champions and compare your progress.",
+  },
+  gamingWeekend: {
+    newsHeadline: 'Boyz, Welcome to Gaming Weekend!',
+    newsLead:
+      "I'm so happy you are here for this gaming weekend. You showed up, and that is what this whole thing is about.",
+    newsPatchPitch:
+      'For this gaming weekend we are giving away patches through Friend Awards. What better place to hand them out than inside the game? Award other players, collect what you earn, and show them off.',
+    newsMissionTitle: 'Your gaming weekend checklist',
+    newsStep1: 'Make an account and sign in',
+    newsStep2: 'Quest, explore, and learn the world',
+    newsStep3: 'Give patches to other players with Friend Awards (Book of Deeds)',
+    newsStep4: 'Hit level 20',
+    newsStep5: 'Run dungeons with your crew',
+    newsStep6: 'Push to endgame and flex what you earned',
+    newsRally: "The realm is open. Hype your Boyz. Let's GOOOO!",
+    newsCharselectBlurb:
+      "Gaming weekend is live. Patches go out through Friend Awards. Quest, award your crew, hit 20, run dungeons, chase endgame. Let's GOOOO!",
+    newsPageTitle: 'Gaming Weekend',
+    newsPageDesc:
+      'Welcome to our gaming weekend: Friend Award patch giveaway, quests, dungeons, and the road to endgame.',
+  },
+  friendAwards: {
+    title: 'Friend Awards Hall',
+    desc: 'Every account on this realm and the awards players received from one another.',
+    accountCol: 'Account',
+    countCol: 'Awards',
+    awardsCol: 'Awards received',
+    empty: 'No friend awards yet.',
+    unavailable: 'Friend awards are not available on this realm.',
   },
   wiki: {
     title: 'Game Wiki & Guide',

@@ -6,6 +6,7 @@ import { ALL_CLASSES, MAX_LEVEL } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   buildDevCommand,
+  DEV_COMMAND_ACTIONS,
   type DevCommandAction,
   type DevCommandCategory,
   devCategoryVisible,
@@ -66,6 +67,7 @@ export interface DevCommandWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  previewCustomAwardReveal?(): void;
 }
 
 function optionsHtml<T extends { id: string }>(
@@ -417,6 +419,13 @@ export class DevCommandWindow {
   }
 
   private run(actionId: string): void {
+    const action = DEV_COMMAND_ACTIONS.find((entry) => entry.id === actionId);
+    if (action?.localOnly) {
+      this.deps.previewCustomAwardReveal?.();
+      this.notice = t('devCommand.sentLocal', { action: t(action.labelKey) });
+      this.render(`[data-dev-run="${actionId}"]`);
+      return;
+    }
     const command = buildDevCommand(actionId, this.values());
     if (!command) {
       this.notice = t('devCommand.invalidValues');

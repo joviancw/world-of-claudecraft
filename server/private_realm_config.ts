@@ -22,6 +22,10 @@ function positiveNumber(env: Env, key: string, warn: (msg: string) => void): num
   return n;
 }
 
+function envFlagOn(env: Env, key: string): boolean {
+  return env[key] === '1';
+}
+
 function positiveInt(env: Env, key: string, warn: (msg: string) => void): number | undefined {
   const n = positiveNumber(env, key, warn);
   if (n === undefined) return undefined;
@@ -45,6 +49,9 @@ export function privateRealmRulesFromEnv(
     leveling: defined({
       killXpMultiplier: positiveNumber(env, 'PRIVATE_REALM_KILL_XP', warn),
       questXpMultiplier: positiveNumber(env, 'PRIVATE_REALM_QUEST_XP', warn),
+      ...(envFlagOn(env, 'PRIVATE_REALM_ALWAYS_RESTED')
+        ? { alwaysRestedAccrual: true as const, alwaysRestedKills: true as const }
+        : {}),
     }),
     dungeons: defined({
       targetPlayers: positiveInt(env, 'PRIVATE_REALM_DUNGEON_PLAYERS', warn),
@@ -56,6 +63,9 @@ export function privateRealmRulesFromEnv(
       dailyAwardCap: positiveInt(env, 'PRIVATE_REALM_AWARD_DAILY_CAP', warn),
     }),
   };
+  if (envFlagOn(env, 'PRIVATE_REALM_MEMBERSHIP_GEAR')) {
+    overrides.membershipGearClaims = true;
+  }
   return resolvePrivateRealmRules(overrides);
 }
 
@@ -65,4 +75,15 @@ let resolved: { rules: PrivateRealmRules | null } | null = null;
 export function privateRealmRules(): PrivateRealmRules | null {
   resolved ??= { rules: privateRealmRulesFromEnv() };
   return resolved.rules;
+}
+
+/** False when PRIVATE_REALM_MEMBERSHIP=0 on an otherwise private realm. */
+export function privateRealmMembershipFromEnv(env: Env = process.env): boolean {
+  if (env.PRIVATE_REALM !== '1') return false;
+  return env.PRIVATE_REALM_MEMBERSHIP !== '0';
+}
+
+/** Advertised on GET /api/status when PRIVATE_REALM=1; stock realms omit this arm. */
+export function privateRealmMembershipGearAdvert(): boolean {
+  return privateRealmRules()?.membershipGearClaims === true;
 }

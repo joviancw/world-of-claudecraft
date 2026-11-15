@@ -78,6 +78,7 @@ export function updateRested(
   p: Entity,
   meta: PlayerMeta,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
+  opts?: { alwaysAccrueOutOfCombat?: boolean },
 ): void {
   if (p.level >= MAX_LEVEL) return;
   const cap = RESTED_CAP_LEVELS * xpForLevel(p.level);
@@ -85,7 +86,9 @@ export function updateRested(
     meta.restedXp = cap;
     return;
   }
-  if (!isResting(p, buildings)) return;
+  const resting =
+    opts?.alwaysAccrueOutOfCombat === true ? !p.inCombat : isResting(p, buildings);
+  if (!resting) return;
   const fillSeconds = RESTED_FILL_HOURS * RESTED_SECONDS_PER_GAME_HOUR;
   const perSecond = (RESTED_FILL_FRACTION * xpForLevel(p.level)) / fillSeconds;
   meta.restedXp = Math.min(cap, meta.restedXp + perSecond * DT);

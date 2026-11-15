@@ -145,6 +145,7 @@ function deferred<T>(): {
 function xpRows(tag: string): LifetimeXpLeaderRow[] {
   return [
     {
+      characterId: 1,
       name: `${tag}-hero`,
       class: 'warrior',
       level: 60,

@@ -13,7 +13,10 @@
 // because tests/command_schema.test.ts scrapes those labels as wire commands
 // (the reason server/flair_command.ts exists too).
 
-import { offensiveName } from './auth';
+import {
+  customAwardAnnouncementMessage,
+  customAwardSentMessage,
+} from '../src/sim/custom_award_messages';
 import { cleanRealmMotdText } from './realm_motd';
 
 export type CustomAwardCommand =
@@ -41,13 +44,8 @@ export function customAwardDailyCap(cap: number): string {
   return `You can award at most ${cap} achievements per day.`;
 }
 
-export function customAwardSent(title: string, recipient: string): string {
-  return `You awarded "${title}" to ${recipient}.`;
-}
-
-export function customAwardAnnouncement(recipient: string, title: string, giver: string): string {
-  return `ACHIEVEMENT UNLOCKED! ${recipient} has earned "${title}"! Awarded by ${giver}.`;
-}
+export const customAwardSent = customAwardSentMessage;
+export const customAwardAnnouncement = customAwardAnnouncementMessage;
 
 /** Parse a chat line as /award, or null when it is not one. */
 export function parseCustomAwardCommand(text: string): CustomAwardCommand | null {
@@ -65,10 +63,6 @@ export function cleanCustomAwardText(raw: string): string {
   return cleanRealmMotdText(raw)
     .replace(/\[{2,}/g, '[')
     .replace(/\]{2,}/g, ']');
-}
-
-function containsBlockedWord(text: string): boolean {
-  return text.split(/\s+/).some((word) => word !== '' && offensiveName(word));
 }
 
 export interface CustomAwardLimits {
@@ -96,7 +90,5 @@ export function draftCustomAward(
     return { ok: false, notice: customAwardDescriptionTooLong(limits.maxDescriptionLength) };
   if (cmd.target.toLowerCase() === giverName.toLowerCase())
     return { ok: false, notice: CUSTOM_AWARD_NOTICES.self };
-  if (containsBlockedWord(title) || containsBlockedWord(description))
-    return { ok: false, notice: CUSTOM_AWARD_NOTICES.offensive };
   return { ok: true, target: cmd.target, title, titleKey: title.toLowerCase(), description };
 }

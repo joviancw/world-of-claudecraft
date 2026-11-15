@@ -70,6 +70,8 @@ export interface QuestLogWindowDeps extends PainterHostPresentation {
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
   openReferralCards?(): void;
+  /** When false, stamp-card quest rows stay out of the quest log. */
+  stampCardQuestsEnabled?(): boolean;
 }
 
 export class QuestLogWindow {
@@ -170,7 +172,7 @@ export class QuestLogWindow {
     }
     const referralSnapshot = world.referralCardsSnapshot?.() ?? null;
     const stampQuests = referralQuestRows(referralSnapshot);
-    if (referralSnapshot?.links.length) {
+    if (referralSnapshot?.links.length && this.deps.stampCardQuestsEnabled?.() !== false) {
       const section = document.createElement('section');
       section.className = 'ql-group referral-quest-group';
       const heading = document.createElement('h3');

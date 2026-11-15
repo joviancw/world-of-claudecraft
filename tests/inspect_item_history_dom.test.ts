@@ -78,6 +78,7 @@ function openWith(e: InspectEntity, selfWorn?: InspectEntity['equippedInstances'
     moneyHtml: () => '',
     itemTooltip: () => '',
     attachTooltip: () => {},
+    customAwardsForPlayer: async () => null,
   });
   win.openInspect(e, 1_700_000_000_000, null, selfWorn);
   return root;

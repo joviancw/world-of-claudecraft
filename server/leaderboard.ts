@@ -66,6 +66,7 @@ import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
 // barrels drag routes.ts and its load-time middleware construction into this
 // module's graph, which partial db mocks in tests cannot serve.
 import { epicEnabled } from './epic/config';
+import { privateRealmMembershipGearAdvert } from './private_realm_config';
 import { type GuildBoardPresence, guildBoardPresence } from './guild_board_presence';
 import { requireAccount } from './http/middleware/require_account';
 import type { Ctx, RouteDef } from './http/types';
@@ -776,6 +777,8 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     epic: { enabled: epicEnabled() },
     dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
     profiler_invulnerability: process.env.ALLOW_DEV_COMMANDS === '1',
+    private_realm: process.env.PRIVATE_REALM === '1',
+    private_realm_membership_gear: privateRealmMembershipGearAdvert(),
   });
 }
 

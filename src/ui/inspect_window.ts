@@ -35,6 +35,7 @@ import {
   deedHeraldryStyle,
 } from './deed_border_view';
 import { deedName, deedTitleText } from './deed_i18n';
+import { inspectCustomAwardsHtml } from './inspect_custom_awards';
 import {
   devCardBadgeClass,
   devTierBadgeDataUrl,
@@ -144,6 +145,11 @@ export interface InspectRemoteProfile {
  *  concerns: focus capture/return, and the shared turntable mount (Hud owns the
  *  single WebGL preview lifecycle, so it re-parents the canvas into the stage). */
 export interface InspectWindowDeps extends Omit<PainterHostPresentation, 'itemTooltip'> {
+  /** Visible custom awards on a player (private realm); null when unavailable. */
+  customAwardsForPlayer(
+    name: string,
+    self: boolean,
+  ): Promise<readonly import('../world_api/deeds').CustomAwardView[] | null>;
   /** Resolve adaptive equipment against its wearer, never the viewing player. */
   itemTooltip(
     item: ItemDef,
@@ -313,6 +319,12 @@ export class InspectWindow {
     const worn = selfEquippedInstances ?? e.equippedInstances;
     const holder: ItemHistoryHolder = selfEquippedInstances ? 'self' : 'other';
     this.paintGear(el, model.gear, e, (cell) => itemHistoryProvenanceFor(worn[cell.slot], holder));
+    const selfInspect = selfStanding !== undefined;
+    void this.deps.customAwardsForPlayer(e.name, selfInspect).then((awards) => {
+      if (!awards?.length || !el.isConnected) return;
+      const equip = el.querySelector('.inspect-equip');
+      equip?.insertAdjacentHTML('beforebegin', inspectCustomAwardsHtml(awards));
+    });
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {

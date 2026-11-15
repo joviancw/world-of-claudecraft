@@ -228,7 +228,7 @@ describe('steam wishlist styling stays quiet', () => {
   it('suppresses every surface at once, for the Steam build and the native shells', () => {
     const css = hudCss();
     expect(css).toContain(
-      'body.steam-wishlist-pending .steam-wishlist,\n  body.native-app .steam-wishlist,\n  body.steam-build .steam-wishlist {\n    display: none !important;\n  }',
+      'body.steam-wishlist-pending .steam-wishlist,\n  body.native-app .steam-wishlist,\n  body.steam-build .steam-wishlist,\n  body.commerce-chrome-hidden .steam-wishlist {\n    display: none !important;\n  }',
     );
     expect(css).toContain(`body.${STEAM_WISHLIST_PENDING_BODY_CLASS} .steam-wishlist`);
     // The class the module stamps and the class the sheet hides must agree.

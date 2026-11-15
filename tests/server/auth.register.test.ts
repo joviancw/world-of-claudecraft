@@ -161,24 +161,48 @@ describe('register handler', () => {
   });
 
   it('rejects a missing or invalid email with 400 before any account read or write', async () => {
-    // v0.20.0: email is mandatory at signup (the recovery address), gated after
-    // the password check and BEFORE the username lookup.
-    let lookups = 0;
+    const prev = process.env.PRIVATE_REALM;
+    process.env.PRIVATE_REALM = '';
+    try {
+      // v0.20.0: email is mandatory at signup (the recovery address), gated after
+      // the password check and BEFORE the username lookup.
+      let lookups = 0;
+      installDb({
+        findAccount: async () => {
+          lookups++;
+          return null;
+        },
+      });
+      const expected = {
+        status: 400,
+        body: { error: 'enter a valid email address', code: 'email.invalid' },
+      };
+      expect(await runHandler({ username: 'newhero', password: 'secret123' })).toEqual(expected);
+      expect(
+        await runHandler({ username: 'newhero', password: 'secret123', email: 'nope' }),
+      ).toEqual(expected);
+      expect(lookups).toBe(0);
+    } finally {
+      process.env.PRIVATE_REALM = prev;
+    }
+  });
+
+  it('allows register without email on a private realm', async () => {
+    const prev = process.env.PRIVATE_REALM;
+    process.env.PRIVATE_REALM = '1';
+    let setEmailCalls = 0;
     installDb({
-      findAccount: async () => {
-        lookups++;
-        return null;
+      setAccountEmail: async () => {
+        setEmailCalls++;
       },
     });
-    const expected = {
-      status: 400,
-      body: { error: 'enter a valid email address', code: 'email.invalid' },
-    };
-    expect(await runHandler({ username: 'newhero', password: 'secret123' })).toEqual(expected);
-    expect(await runHandler({ username: 'newhero', password: 'secret123', email: 'nope' })).toEqual(
-      expected,
-    );
-    expect(lookups).toBe(0);
+    try {
+      const out = await runHandler({ username: 'newhero', password: 'secret123' });
+      expect(out.status).toBe(200);
+      expect(setEmailCalls).toBe(0);
+    } finally {
+      process.env.PRIVATE_REALM = prev;
+    }
   });
 
   it('returns 409 when the username is already taken', async () => {

@@ -2,6 +2,7 @@ import type { Api } from '../net/online';
 import { DESKTOP_APP } from '../net/online';
 import type { DesktopBridge } from '../runtime';
 import { desktopBridge } from '../runtime';
+import { isCommerceChromeHiddenOnDocument } from './commerce_chrome_policy';
 import { userFacingApiError } from './api_error_i18n';
 import { t } from './i18n';
 
@@ -49,6 +50,10 @@ async function epicProofCapability(bridge: DesktopBridge | null): Promise<boolea
 }
 
 export async function refreshEpicLinkStatus(api: Api): Promise<void> {
+  if (isCommerceChromeHiddenOnDocument()) {
+    document.getElementById('cs-epic-group')?.setAttribute('hidden', '');
+    return;
+  }
   const group = document.getElementById('cs-epic-group');
   if (!group) return;
   if (!api.token) {

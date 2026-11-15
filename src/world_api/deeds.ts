@@ -73,15 +73,60 @@ export interface CustomAwardView {
   createdAt: number;
 }
 
+export interface CustomAwardGivenView {
+  id: number;
+  title: string;
+  description: string;
+  recipientName: string;
+  createdAt: number;
+}
+
 // The self character's player-awarded achievements and the recipient's two
 // controls. The server owns every rule (ownership, private-realm gate).
 export interface CustomAwardsSource {
   // Newest first, hidden ones included (flagged); null on any failure.
   list(): Promise<readonly CustomAwardView[] | null>;
+  // Awards this character granted to others (newest first); null on failure.
+  listGiven(): Promise<readonly CustomAwardGivenView[] | null>;
+  // Visible awards on a named character (inspect); null when disabled or failed.
+  listPublicForName(characterName: string): Promise<readonly CustomAwardView[] | null>;
   // Hide from (or show again on) the recipient's own Book; true on success.
   setHidden(awardId: number, hidden: boolean): Promise<boolean>;
   // Turn the award down for good: it leaves the Book and cannot be re-awarded.
   reject(awardId: number): Promise<boolean>;
+}
+
+// One saved award template the self character authored in the Book of Deeds.
+export interface CustomAwardTemplateView {
+  id: number;
+  title: string;
+  description: string;
+  // Epoch milliseconds.
+  createdAt: number;
+}
+
+export type CustomAwardIssueOutcome =
+  | 'ok'
+  | 'failed'
+  | 'not_found'
+  | 'self'
+  | 'duplicate'
+  | 'capped'
+  | 'busy';
+
+export type CustomAwardTemplateCreateOutcome =
+  | 'ok'
+  | 'failed'
+  | 'invalid'
+  | 'duplicate'
+  | 'capped';
+
+// Templates the self character keeps and issues to other players.
+export interface CustomAwardTemplatesSource {
+  list(): Promise<readonly CustomAwardTemplateView[] | null>;
+  create(title: string, description: string): Promise<CustomAwardTemplateCreateOutcome>;
+  delete(templateId: number): Promise<boolean>;
+  issue(templateId: number, recipientName: string): Promise<CustomAwardIssueOutcome>;
 }
 
 export interface IWorldDeeds {
@@ -90,6 +135,9 @@ export interface IWorldDeeds {
   // REST surface (/api/custom-awards), which answers an empty list when the
   // realm is not private.
   readonly customAwards: CustomAwardsSource | null;
+  // Saved award templates the self character can issue, or null where the host
+  // has none: the offline Sim is always null; online uses /api/custom-award-*.
+  readonly customAwardTemplates: CustomAwardTemplatesSource | null;
   // Deed id -> the utcDay it was earned ('YYYY-MM-DD', '' when the host set
   // no calendar), for the SELF player. Readonly across the seam: consumers
   // never mutate deed state.

@@ -169,6 +169,7 @@ export const zh_TW: EnTranslations = {
     "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "執行此指令前請選擇有效值。",
     "sent": "已傳送：{command}",
+    "sentLocal": "Ran: {action}",
     "run": "執行",
     "fields": {
       "level": "等級",
@@ -328,6 +329,10 @@ export const zh_TW: EnTranslations = {
       "hillend": {
         "label": "結束山丘",
         "description": "讓目前的山丘立刻消失。"
+      },
+      "customAwardRevealPreview": {
+        "label": "Preview friend award reveal",
+        "description": "Play the five-second achievement reveal overlay with sample copy."
       }
     }
   },
@@ -1070,6 +1075,7 @@ export const zh_TW: EnTranslations = {
     "customAward": {
       "line": "成就解鎖！{name} 獲得了「{title}」！由 {giver} 授予。",
       "sent": "你將「{title}」授予了 {name}。",
+      "sentCelebrate": "Award sent!",
       "usage": "用法：/award <名字> \"<標題>\" <描述>",
       "self": "你不能給自己授予成就。",
       "offensive": "該成就包含不允許使用的詞語。",
@@ -1094,7 +1100,42 @@ export const zh_TW: EnTranslations = {
       "removeTitle": "取消頭銜",
       "wearTitleAria": "將 {title} 設為你的頭銜",
       "removeTitleAria": "不再使用 {title} 作為你的頭銜",
-      "actionFailed": "該變更未能儲存，請稍後再試。"
+      "actionFailed": "該變更未能儲存，請稍後再試。",
+      "templatesSectionTitle": "Your Awards",
+      "templatesHint": "Create an award here, then issue it to a friend by character name.",
+      "templatesEmpty": "No saved awards yet. Create one above.",
+      "templatesNew": "New award",
+      "templatesSave": "Save",
+      "templatesCancel": "Cancel",
+      "templatesTitleField": "Award title",
+      "templatesTitlePlaceholder": "Title",
+      "templatesDescField": "Award description",
+      "templatesDescPlaceholder": "Description (optional)",
+      "templatesTitleRequired": "Enter a title before saving.",
+      "templatesInvalid": "That award could not be saved. Check the length and wording.",
+      "templateCap": "You have too many saved awards. Delete one first.",
+      "templatesIssue": "Issue",
+      "templatesDelete": "Delete",
+      "templatesSend": "Send",
+      "templatesSending": "Sending…",
+      "templatesCancelIssue": "Cancel",
+      "templatesRecipientField": "Recipient character name",
+      "templatesRecipientPlaceholder": "Character name",
+      "templatesRecipientRequired": "Enter the recipient character name.",
+      "templatesIssued": "Award sent.",
+      "templatesDailyCap": "You reached the daily limit for sending awards.",
+      "givenSectionTitle": "Awards You Gave",
+      "givenEmpty": "No awards issued yet.",
+      "givenTo": "Given to {name} on {date}",
+      "inspectSectionTitle": "Friend Awards",
+      "gamingWeekendPromoOpen": "Book of Deeds: Titles and Awards",
+      "gamingWeekendPromoClose": "Dismiss weekend notice",
+      "gamingWeekendPromoEyebrow": "Gaming weekend",
+      "gamingWeekendPromoTitle": "We are giving away patches with Friend Awards this gaming weekend. Open the Book of Deeds and award your Boyz!",
+      "gamingWeekendPromoCta": "Open Book of Deeds",
+      "revealEyebrow": "Achievement Unlocked",
+      "revealRecipient": "{name} earned this honor",
+      "revealGiver": "Awarded by {name}"
     },
     "readyCheck": {
       "title": "就緒確認",
@@ -2131,6 +2172,7 @@ export const zh_TW: EnTranslations = {
       "close": "關閉",
       "tabsLabel": "高分榜",
       "tabPlayers": "玩家",
+      "friendAwardsCol": "Friend awards",
       "tabGuilds": "公會",
       "tabDevs": "開發者",
       "guildName": "公會",
@@ -13703,6 +13745,7 @@ export const zh_TW: EnTranslations = {
     "stats": "數據統計",
     "about": "關於",
     "highscores": "排行榜",
+    "friendAwards": "Friend Awards",
     "wiki": "百科指南",
     "news": "最新消息",
     "download": "下載客戶端",
@@ -13743,6 +13786,31 @@ export const zh_TW: EnTranslations = {
   "highscores": {
     "title": "高分排行榜",
     "desc": "追蹤這個世界中最偉大的英雄，並對比你的遊戲進度。"
+  },
+  "gamingWeekend": {
+    "newsHeadline": "Boyz, Welcome to Gaming Weekend!",
+    "newsLead": "I'm so happy you are here for this gaming weekend. You showed up, and that is what this whole thing is about.",
+    "newsPatchPitch": "For this gaming weekend we are giving away patches through Friend Awards. What better place to hand them out than inside the game? Award other players, collect what you earn, and show them off.",
+    "newsMissionTitle": "Your gaming weekend checklist",
+    "newsStep1": "Make an account and sign in",
+    "newsStep2": "Quest, explore, and learn the world",
+    "newsStep3": "Give patches to other players with Friend Awards (Book of Deeds)",
+    "newsStep4": "Hit level 20",
+    "newsStep5": "Run dungeons with your crew",
+    "newsStep6": "Push to endgame and flex what you earned",
+    "newsRally": "The realm is open. Hype your Boyz. Let's GOOOO!",
+    "newsCharselectBlurb": "Gaming weekend is live. Patches go out through Friend Awards. Quest, award your crew, hit 20, run dungeons, chase endgame. Let's GOOOO!",
+    "newsPageTitle": "Gaming Weekend",
+    "newsPageDesc": "Welcome to our gaming weekend: Friend Award patch giveaway, quests, dungeons, and the road to endgame."
+  },
+  "friendAwards": {
+    "title": "Friend Awards Hall",
+    "desc": "Every account on this realm and the awards players received from one another.",
+    "accountCol": "Account",
+    "countCol": "Awards",
+    "awardsCol": "Awards received",
+    "empty": "No friend awards yet.",
+    "unavailable": "Friend awards are not available on this realm."
   },
   "wiki": {
     "title": "遊戲百科與指南",

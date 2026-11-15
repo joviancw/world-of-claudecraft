@@ -10,9 +10,12 @@ const gameStart = compose.indexOf('\n  game:');
 const discordStart = compose.indexOf('\n  discord-bot:');
 const gameService = compose.slice(gameStart, discordStart);
 
-// Every key server/private_realm_config.ts reads.
+// Every PRIVATE_REALM* key server/private_realm_config.ts reads.
 const KEYS = [
   'PRIVATE_REALM',
+  'PRIVATE_REALM_MEMBERSHIP',
+  'PRIVATE_REALM_MEMBERSHIP_GEAR',
+  'PRIVATE_REALM_ALWAYS_RESTED',
   'PRIVATE_REALM_KILL_XP',
   'PRIVATE_REALM_QUEST_XP',
   'PRIVATE_REALM_DUNGEON_PLAYERS',

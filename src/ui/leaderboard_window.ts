@@ -76,6 +76,7 @@ import {
   WORLD_QUEST_RANKINGS_ROOT_ID,
   WorldQuestLeaderboardWindow,
 } from './world_quest_leaderboard_window';
+import { formatFriendAwardsLeaderboardCell } from './friend_awards_leaderboard_cell';
 import { formatXp } from './xp_bar';
 
 /** Which high-score board the window is showing. */
@@ -314,11 +315,12 @@ export class LeaderboardWindow {
     // Mirror the server's clamped page back into the pager state.
     this.page = view.page;
     const split = podiumSplit(view.page, view.rows, (row) => row.rank);
+    const friendAwardsCol = this.playersFriendAwardsColumn(view.rows);
     body.innerHTML =
       this.podiumHtml(split.podium.map((slot) => playersPodiumSlot(slot, deedTitleText))) +
-      this.headerHtml() +
-      split.listed.map((r) => this.rowHtml(r)).join('') +
-      this.stickyHtml(playersStandingBar(view.rows, view.standing)) +
+      this.headerHtml(friendAwardsCol) +
+      split.listed.map((r) => this.rowHtml(r, friendAwardsCol)).join('') +
+      this.stickyHtml(playersStandingBar(view.rows, view.standing), friendAwardsCol) +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -719,14 +721,28 @@ export class LeaderboardWindow {
     });
   }
 
-  private headerHtml(): string {
+  private playersFriendAwardsColumn(rows: readonly LeaderboardRow[]): boolean {
+    return rows.some((r) => r.friendAwards !== undefined);
+  }
+
+  private playersRowClass(friendAwardsCol: boolean): string {
+    return friendAwardsCol
+      ? 'lb-row lb-row-players lb-row-players--friend-awards'
+      : 'lb-row lb-row-players';
+  }
+
+  private headerHtml(friendAwardsCol: boolean): string {
     return (
-      `<div class="lb-row lb-row-players lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
+      `<div class="${this.playersRowClass(friendAwardsCol)} lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
       `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
       `<span class="lb-lvl">${esc(t('game.leaderboard.level'))}</span>` +
       `<span class="lb-vlvl">${esc(t('game.leaderboard.vlevel'))}</span>` +
       `<span class="lb-xp">${esc(t('game.leaderboard.lifetimeXp'))}</span>` +
-      `<span class="lb-deed-title">${esc(t('hudChrome.deeds.lbTitleCol'))}</span></div>`
+      `<span class="lb-deed-title">${esc(t('hudChrome.deeds.lbTitleCol'))}</span>` +
+      (friendAwardsCol
+        ? `<span class="lb-friend-awards">${esc(t('hudChrome.leaderboard.friendAwardsCol'))}</span>`
+        : '') +
+      `</div>`
     );
   }
 
@@ -867,7 +883,7 @@ export class LeaderboardWindow {
     );
   }
 
-  private rowHtml(r: LeaderboardRow): string {
+  private rowHtml(r: LeaderboardRow, friendAwardsCol: boolean): string {
     // &starf; renders the prestige star without a literal symbol glyph in source.
     const star =
       r.prestigeRank > 0
@@ -878,12 +894,18 @@ export class LeaderboardWindow {
     // The Renown-tab title-cell treatment: a deed id in the view-model,
     // localized here; '' (untitled/stale) renders an empty cell.
     const deedTitle = r.title ? deedTitleText(r.title) : '';
+    const friendAwards =
+      friendAwardsCol && r.friendAwards
+        ? formatFriendAwardsLeaderboardCell(r.friendAwards)
+        : '';
     return (
-      `<div class="lb-row lb-row-players${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
+      `<div class="${this.playersRowClass(friendAwardsCol)}${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-name"${title}>${star}${esc(r.name)}${guildTagHtml(r.guild, 'lb-guild')}${you}</span>` +
       `<span class="lb-lvl">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span>` +
-      `<span class="lb-deed-title">${esc(deedTitle)}</span></div>`
+      `<span class="lb-deed-title">${esc(deedTitle)}</span>` +
+      (friendAwardsCol ? `<span class="lb-friend-awards">${esc(friendAwards)}</span>` : '') +
+      `</div>`
     );
   }
 
@@ -893,7 +915,10 @@ export class LeaderboardWindow {
   // markup so the row keeps the players grid variant the source pins read.
   // &mdash; is the unranked-rank placeholder, kept as an entity so the source
   // carries no literal em dash (project style rule).
-  private stickyHtml(standing: (LeaderboardStanding & { rank: number | null }) | null): string {
+  private stickyHtml(
+    standing: (LeaderboardStanding & { rank: number | null }) | null,
+    friendAwardsCol = false,
+  ): string {
     if (!standing) return '';
     const rankCell =
       standing.rank === null
@@ -902,12 +927,13 @@ export class LeaderboardWindow {
     // The Renown-tab title-cell treatment, mirroring rowHtml: a deed id in the
     // view-model, localized here; '' (untitled/stale) renders an empty cell.
     const deedTitle = standing.title ? deedTitleText(standing.title) : '';
+    const colSpan = friendAwardsCol ? `<span class="lb-friend-awards"></span>` : '';
     return (
-      `<div class="lb-sticky lb-standing">${this.standingLabelHtml()}<div class="lb-row lb-row-players lb-mine"><span class="lb-rank">${rankCell}</span>` +
+      `<div class="lb-sticky lb-standing">${this.standingLabelHtml()}<div class="${this.playersRowClass(friendAwardsCol)} lb-mine"><span class="lb-rank">${rankCell}</span>` +
       `<span class="lb-name">${esc(standing.name)}${guildTagHtml(standing.guild, 'lb-guild')} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
       `<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
-      `<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>`
+      `<span class="lb-deed-title">${esc(deedTitle)}</span>${colSpan}</div></div>`
     );
   }
 

@@ -1,6 +1,7 @@
 // Trusted host entitlement, measured against the deterministic sim clock. Never
 // loaded from CharacterState. Stored armour carries no authority of its own.
 import { recalcPlayerStats } from './entity';
+import { privateRealmMembershipGearClaimsEnabled } from './private_realm';
 import { perfectMembershipArmour } from './membership_armour_progression';
 import { syncMembershipBag } from './membership_bag_slot';
 import { claimScalingArmour } from './scaling_armour_claim';
@@ -29,8 +30,12 @@ export function setMembership(ctx: SimContext, pid: number, remainingSeconds: nu
   meta.wireRev++;
   ctx.refreshKnownAbilities(meta, false);
   if (active) {
-    claimMembershipArmour(ctx, pid, true);
-    perfectMembershipArmour(meta, p.level);
+    if (privateRealmMembershipGearClaimsEnabled(ctx.cfg.privateRealm)) {
+      claimMembershipArmour(ctx, pid, true);
+      perfectMembershipArmour(meta, p.level);
+    } else if (meta.referralArmour) {
+      claimScalingArmour(ctx, pid, 'referral', true);
+    }
   }
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
 }
@@ -48,7 +53,9 @@ export function updateMembership(ctx: SimContext, meta: PlayerMeta, p: Entity): 
 export function claimMembershipArmour(ctx: SimContext, pid?: number, quiet = false): void {
   const resolved = ctx.resolve(pid);
   if (!resolved || resolved.e.dead) return;
+  const gear = privateRealmMembershipGearClaimsEnabled(ctx.cfg.privateRealm);
   if (
+    gear &&
     membershipActive(resolved.meta, ctx.time) &&
     !claimScalingArmour(ctx, resolved.meta.entityId, 'membership', quiet)
   )

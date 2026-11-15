@@ -1053,14 +1053,14 @@ describe('client HTML shell', () => {
     );
     expect(dataDeletionHtml).toContain('<h1>Data Deletion</h1>');
     expect(dataDeletionHtml).toContain('href="mailto:woc@levystreet.com"');
-    expect(dataDeletionHtml).toContain('href="https://discord.com/invite/worldofclaudecraft"');
+    expect(dataDeletionHtml).toContain('href="https://discord.com/channels/953442947427348493/"');
     expect(dataDeletionHtml).toContain('href="/support">Support</a>');
     expect(supportHtml).toContain(
       '<link rel="canonical" href="https://worldofclaudecraft.com/support" />',
     );
     expect(supportHtml).toContain('<h1>Support</h1>');
     expect(supportHtml).toContain('href="mailto:woc@levystreet.com"');
-    expect(supportHtml).toContain('href="https://discord.com/invite/worldofclaudecraft"');
+    expect(supportHtml).toContain('href="https://discord.com/channels/953442947427348493/"');
     expect(supportHtml).toContain('href="/data-deletion">Data Deletion page</a>');
     expect(supportHtml).toContain('"@type": "ContactPage"');
     expect(html).toContain(
@@ -1163,8 +1163,7 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('nativeApp: NATIVE_APP,');
     expect(mainTs).toContain('desktopApp: DESKTOP_APP,');
     expect(mainTs).toContain('bridge: DESKTOP_APP ? desktopBridge() : null,');
-    expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
-    expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
+    expect(mainTs).toContain('removeWalletShellChrome();');
     expect(mainTs).toContain("disconnectBtn.className = 'wallet-mini wallet-picker-disconnect';");
     expect(mainTs).toContain("closeWalletPicker({ action: 'disconnect' });");
     expect(mainTs).toContain('await openDesktopWalletManager();');

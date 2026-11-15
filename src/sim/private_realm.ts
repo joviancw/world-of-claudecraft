@@ -1,6 +1,6 @@
-// Private-realm rules: the one knob set for a small invite-only realm (eight
+// Private-realm rules: the one knob set for a small invite-only realm (nine
 // friends levelling 1 to 20, then running the five-player dungeons and the
-// raids as one eight-player raid group). A pure leaf: no SimContext, no rng,
+// raids as one nine-player raid group). A pure leaf: no SimContext, no rng,
 // no clock. The host passes a resolved rules object through
 // SimConfig.privateRealm; null (the default everywhere) means every rule
 // below is inert and the world is byte-identical to a stock realm.
@@ -12,6 +12,10 @@ export interface PrivateRealmLevelingRules {
   // Scales every other XP award: quests, world quests, delves, crafting and
   // gathering (every grantXp call that is not a kill).
   questXpMultiplier: number;
+  // Accrue rested XP anywhere while out of combat, not only inside inn footprints.
+  alwaysRestedAccrual: boolean;
+  // Kill XP always earns the classic rested bonus (2x) without drawing the pool.
+  alwaysRestedKills: boolean;
 }
 
 export interface PrivateRealmDungeonRules {
@@ -31,20 +35,30 @@ export interface PrivateRealmAchievementRules {
   globalAnnouncements: boolean;
   maxTitleLength: number;
   maxDescriptionLength: number;
-  // Most custom awards one character may create per rolling day.
+  // Most custom awards one character may grant per rolling day.
   dailyAwardCap: number;
+  // Award templates one character may keep in the Book of Deeds.
+  maxTemplatesPerOwner: number;
 }
 
 export interface PrivateRealmRules {
   leveling: PrivateRealmLevelingRules;
   dungeons: PrivateRealmDungeonRules;
   achievements: PrivateRealmAchievementRules;
+  // When false, trusted membership activation and claim commands never mint
+  // adaptive membership armour or the membership weapon (slots and bank stay on).
+  membershipGearClaims: boolean;
 }
 
 export const PRIVATE_REALM_DEFAULTS: Readonly<PrivateRealmRules> = Object.freeze({
-  leveling: Object.freeze({ killXpMultiplier: 1, questXpMultiplier: 1 }),
+  leveling: Object.freeze({
+    killXpMultiplier: 1,
+    questXpMultiplier: 1,
+    alwaysRestedAccrual: false,
+    alwaysRestedKills: false,
+  }),
   dungeons: Object.freeze({
-    targetPlayers: 8,
+    targetPlayers: 9,
     minimumLevel: 20,
     healthMultiplier: 1.5,
     damageMultiplier: 1.15,
@@ -55,13 +69,16 @@ export const PRIVATE_REALM_DEFAULTS: Readonly<PrivateRealmRules> = Object.freeze
     maxTitleLength: 40,
     maxDescriptionLength: 160,
     dailyAwardCap: 10,
+    maxTemplatesPerOwner: 50,
   }),
+  membershipGearClaims: false,
 });
 
 export interface PrivateRealmOverrides {
   leveling?: Partial<PrivateRealmLevelingRules>;
   dungeons?: Partial<PrivateRealmDungeonRules>;
   achievements?: Partial<PrivateRealmAchievementRules>;
+  membershipGearClaims?: boolean;
 }
 
 export function resolvePrivateRealmRules(overrides: PrivateRealmOverrides = {}): PrivateRealmRules {
@@ -69,7 +86,22 @@ export function resolvePrivateRealmRules(overrides: PrivateRealmOverrides = {}):
     leveling: { ...PRIVATE_REALM_DEFAULTS.leveling, ...overrides.leveling },
     dungeons: { ...PRIVATE_REALM_DEFAULTS.dungeons, ...overrides.dungeons },
     achievements: { ...PRIVATE_REALM_DEFAULTS.achievements, ...overrides.achievements },
+    membershipGearClaims:
+      overrides.membershipGearClaims ?? PRIVATE_REALM_DEFAULTS.membershipGearClaims,
   };
+}
+
+/** Stock realms and offline sims keep membership gear claims; private realms default off. */
+export function privateRealmMembershipGearClaimsEnabled(
+  rules: PrivateRealmRules | null | undefined,
+): boolean {
+  return rules ? rules.membershipGearClaims : true;
+}
+
+export function privateRealmAlwaysRestedKills(
+  rules: PrivateRealmRules | null | undefined,
+): boolean {
+  return rules?.leveling.alwaysRestedKills === true;
 }
 
 // The scaled XP award, floored like every other XP multiplier in grantXp.

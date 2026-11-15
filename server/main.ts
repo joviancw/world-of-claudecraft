@@ -113,6 +113,12 @@ import {
   warmUsernameBanlist,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { onCustomAwardChanged } from './custom_award_changes';
+import { setCustomAwardsService } from './custom_awards_bridge';
+import { listPublicCustomAwardsForRecipients } from './custom_awards_db';
+import { privateRealmMembershipGearAdvert } from './private_realm_config';
+import { privateRealmMembershipGranted } from './private_realm_membership';
+import { emailMissingForClient, resolveSignupEmail } from './signup_email_policy';
 import { createBackgroundDbGate } from './background_db_gate';
 import { computeBankBonus } from './bank_entitlements';
 import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle, bankLedgerTailStats } from './bank_ledger';
@@ -605,6 +611,9 @@ function liveGame(): GameServer {
   if (!gameInstance) {
     const game = new GameServer(undefined, majorBackgroundDbGate);
     game.customAwards.bindSim(() => game.sim);
+    setCustomAwardsService(game.customAwards);
+    game.customAwards.onAwarded(() => bustPlayerLeaderboardCaches());
+    onCustomAwardChanged(() => bustPlayerLeaderboardCaches());
     gameInstance = game;
   }
   return gameInstance;
@@ -675,6 +684,13 @@ const leaderboardCache: Record<
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
   const epoch = boardEpoch;
   const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const friendAwardsById =
+    privateRealmMembershipGranted() && scope === 'realm'
+      ? await listPublicCustomAwardsForRecipients(
+          () => pool,
+          rows.map((r) => r.characterId),
+        )
+      : null;
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
     name: r.name,
@@ -690,6 +706,11 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     // on the wire.
     ...(r.guild ? { guild: r.guild } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
+    ...(friendAwardsById
+      ? {
+          friendAwards: friendAwardsById.get(r.characterId) ?? [],
+        }
+      : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
   if (boardEpoch === epoch) leaderboardCache[scope] = { at: Date.now(), entries };
@@ -982,6 +1003,12 @@ async function deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | 
 // lost-bust race: a refresh already in flight when this fires will decline to
 // install its pre-ban snapshot (see boardEpoch), so a ban cannot be masked for up
 // to a TTL cycle.
+function bustPlayerLeaderboardCaches(): void {
+  boardEpoch++;
+  leaderboardCache.realm = null;
+  leaderboardCache.global = null;
+}
+
 function bustBoardCaches(): void {
   boardEpoch++;
   leaderboardCache.realm = null;
@@ -1678,10 +1705,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           error: `password must be at most ${MAX_PASSWORD_LENGTH} chars`,
           code: 'account.password_too_long',
         });
-      // Email is mandatory at signup: it is the recovery address that later proves
-      // account ownership on a password reset, so we capture it up front.
-      const signupEmail = normalizeEmail(body.email);
-      if (!signupEmail)
+      const signupEmail = resolveSignupEmail(body);
+      if (signupEmail === 'invalid')
         return json(res, 400, {
           error: 'enter a valid email address',
           code: 'email.invalid',
@@ -1713,21 +1738,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // synchronous so the welcome mail already carries the signup locale and
       // opt-in state; the capture below persists them (plus attribution).
       const signupProfile = parseSignupProfile(req, body);
-      await setAccountEmail(account.id, signupEmail);
-      emailAccountCreated({
-        id: account.id,
-        username: account.username,
-        email: signupEmail,
-        locale: signupProfile.locale,
-        marketing_opt_in: signupProfile.marketingOptIn,
-      });
+      if (signupEmail) {
+        await setAccountEmail(account.id, signupEmail);
+        emailAccountCreated({
+          id: account.id,
+          username: account.username,
+          email: signupEmail,
+          locale: signupProfile.locale,
+          marketing_opt_in: signupProfile.marketingOptIn,
+        });
+      }
       // First-touch attribution + locale/country/opt-in persistence
       // (fire-and-forget; must never block or fail registration).
       captureSignupContext(account.id, req, body, signupProfile);
       void trackAccountCreated(
         account.id,
         {
-          email: signupEmail,
+          ...(signupEmail ? { email: signupEmail } : {}),
           ...metaRequestUserData(req, meta),
         },
         metaEventSourceUrl(req),
@@ -1806,7 +1833,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       await saveToken(token, account.id);
       // Tell the client whether this (possibly pre-email) account still needs a
       // recovery address, so it can force the mandatory-email prompt on sign-in.
-      const emailMissing = !(account.email && account.email.trim());
+      const emailMissing = emailMissingForClient(account.email);
       return json(res, 200, { token, username: account.username, emailMissing });
     }
     if (req.method === 'POST' && url === '/api/desktop-login/create') {
@@ -2335,6 +2362,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         // harness to stop before entry because the dev gate is off. Dual-arm
         // edit: the migrated statusHandler carries the identical field.
         profiler_invulnerability: process.env.ALLOW_DEV_COMMANDS === '1',
+        private_realm: process.env.PRIVATE_REALM === '1',
+        private_realm_membership_gear: privateRealmMembershipGearAdvert(),
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load

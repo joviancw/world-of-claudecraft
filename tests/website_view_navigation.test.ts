@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createWebsiteViewNavigation } from '../src/game/website_view_navigation';
 
-const views = ['hero', 'news', 'highscores', 'download', 'account'];
+const views = ['hero', 'news', 'highscores', 'friend-awards', 'download', 'account'];
 let reducedMotion = false;
 beforeEach(() => {
   vi.useFakeTimers();
@@ -38,7 +38,9 @@ function expectView(name: string) {
   );
 }
 describe('website view navigation', () => {
-  it.each(['news', 'highscores', 'download', 'account'])('returns to Play from %s', (name) => {
+  it.each(['news', 'highscores', 'friend-awards', 'download', 'account'])(
+    'returns to Play from %s',
+    (name) => {
     const navigate = createWebsiteViewNavigation(vi.fn());
     navigate(`#${name}-view`);
     vi.runAllTimers();

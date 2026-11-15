@@ -1,3 +1,5 @@
+import { COMMUNITY_DISCORD_INVITE_URL } from '../discord_community_url';
+
 // Client-side Discord integration state surfaced in the HUD widget.
 //
 // Discord link status, reward points/tier, server presence and voice-room
@@ -75,7 +77,7 @@ const NO_PRESENCE: DiscordPresenceState = {
 // The public, static invite: used until the server-fetched inviteUrl (below)
 // resolves, and whenever it never does (offline entry, or a click that races
 // the fetch). A community link is meant to fail open, never open blank.
-export const DEFAULT_DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';
+export const DEFAULT_DISCORD_INVITE_URL = COMMUNITY_DISCORD_INVITE_URL;
 
 let enabled = false;
 let status: DiscordAccountStatus = UNLINKED;

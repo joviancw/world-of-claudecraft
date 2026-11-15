@@ -39,7 +39,6 @@ import {
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
   newToken,
-  normalizeEmail,
   offensiveName,
   validUsernameShape,
   verifyPassword,
@@ -75,6 +74,7 @@ import {
 } from './ratelimit';
 import { resolveReferralSignup } from './referral_armour_db';
 import { captureSignupContext, parseSignupProfile } from './signup_attribution';
+import { emailMissingForClient, resolveSignupEmail } from './signup_email_policy';
 import { isWebClientRequest, webLoginEnforced } from './web_login_guard';
 
 // ---------------------------------------------------------------------------
@@ -261,11 +261,10 @@ async function registerHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 400, { error: PASSWORD_TOO_LONG, code: 'account.password_too_long' });
     return;
   }
-  // Email is mandatory at signup: it is the recovery address that later proves
-  // account ownership on a password reset, so we capture it up front (mirrors the
-  // legacy arm's check order: after the password gate, before the username lookup).
-  const signupEmail = normalizeEmail(body.email);
-  if (!signupEmail) {
+  // Stock realms require a recovery email at signup; private realms do not
+  // (server/signup_email_policy.ts). Same check order as the legacy arm.
+  const signupEmail = resolveSignupEmail(body);
+  if (signupEmail === 'invalid') {
     json(ctx.res, 400, { error: EMAIL_INVALID, code: 'email.invalid' });
     return;
   }
@@ -297,14 +296,16 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   // synchronous so the welcome mail already carries the signup locale and
   // opt-in state; the capture below persists them (plus attribution).
   const profile = parseSignupProfile(ctx.req, body);
-  await authDb.setAccountEmail(account.id, signupEmail);
-  authDb.emailAccountCreated({
-    id: account.id,
-    username: account.username,
-    email: signupEmail,
-    locale: profile.locale,
-    marketing_opt_in: profile.marketingOptIn,
-  });
+  if (signupEmail) {
+    await authDb.setAccountEmail(account.id, signupEmail);
+    authDb.emailAccountCreated({
+      id: account.id,
+      username: account.username,
+      email: signupEmail,
+      locale: profile.locale,
+      marketing_opt_in: profile.marketingOptIn,
+    });
+  }
   // First-touch attribution + locale/country/opt-in persistence
   // (fire-and-forget; must never block or fail registration).
   authDb.captureSignupContext(account.id, ctx.req, body, profile);
@@ -313,7 +314,7 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   void authDb.trackAccountCreated(
     account.id,
     {
-      email: signupEmail,
+      ...(signupEmail ? { email: signupEmail } : {}),
       // RequestMetadata's fields are nullable; the CAPI reader wants string | undefined.
       ...metaRequestUserData(ctx.req, {
         ip: meta.ip ?? undefined,
@@ -345,8 +346,8 @@ async function registerHandler(ctx: Ctx): Promise<void> {
       logger.error({ err, accountId: account.id }, 'pbe account boost failed');
     }
   }
-  // emailMissing is always false here (email is required above); sent so the
-  // client can use one uniform post-auth check across register and login.
+  // Fresh signup: emailMissing false when an address was stored, or when the
+  // private realm waives email entirely (no recovery prompt).
   json(ctx.res, 200, {
     token,
     username: account.username,
@@ -410,7 +411,7 @@ async function loginHandler(ctx: Ctx): Promise<void> {
   await authDb.saveToken(token, account.id);
   // Tell the client whether this (possibly pre-email) account still needs a
   // recovery address, so it can force the mandatory-email prompt on sign-in.
-  const emailMissing = !(account.email && account.email.trim());
+  const emailMissing = emailMissingForClient(account.email);
   json(ctx.res, 200, { token, username: account.username, emailMissing });
 }
 

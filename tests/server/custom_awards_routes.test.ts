@@ -6,11 +6,13 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_custom_aw
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CustomAwardRow, CustomAwardsStore } from '../../server/custom_awards_db';
+import type { CustomAwardTemplateRow, CustomAwardTemplatesStore } from '../../server/custom_award_templates_db';
 import {
   type CustomAwardsRuntime,
   configureCustomAwardsRuntime,
   routes,
 } from '../../server/custom_awards_routes';
+import { setCustomAwardsService } from '../../server/custom_awards_bridge';
 import type { Ctx, Method, RouteDef } from '../../server/http/types';
 import { fakeCtx } from './helpers/fake_ctx';
 import type { FakeRes } from './helpers/fake_http';
@@ -28,8 +30,18 @@ const award: CustomAwardRow = {
   createdAt: 1_700_000_000,
 };
 
+const ACHIEVEMENT_RULES = {
+  customAwardsEnabled: true,
+  globalAnnouncements: true,
+  maxTitleLength: 40,
+  maxDescriptionLength: 160,
+  dailyAwardCap: 10,
+  maxTemplatesPerOwner: 50,
+};
+
 let enabled = true;
 let calls: string[] = [];
+let templateCalls: string[] = [];
 
 function fakeStore(): CustomAwardsStore {
   return {
@@ -38,6 +50,14 @@ function fakeStore(): CustomAwardsStore {
     listFor: async (cid) => {
       calls.push(`list:${cid}`);
       return [award];
+    },
+    listGivenBy: async (cid) => {
+      calls.push(`given:${cid}`);
+      return [];
+    },
+    listPublicForRecipientName: async (name) => {
+      calls.push(`public:${name}`);
+      return name === 'Bob' ? [award] : [];
     },
     setHidden: async (cid, id, hidden) => {
       calls.push(`hide:${cid}:${id}:${hidden}`);
@@ -50,17 +70,54 @@ function fakeStore(): CustomAwardsStore {
   };
 }
 
+const template: CustomAwardTemplateRow = {
+  id: 9,
+  title: 'MVP',
+  description: 'Carried the run.',
+  createdAt: 1_700_000_100,
+};
+
+function fakeTemplates(): CustomAwardTemplatesStore {
+  return {
+    listFor: async (cid) => {
+      templateCalls.push(`listTemplates:${cid}`);
+      return [template];
+    },
+    create: async (cid, title, titleKey, description, max) => {
+      templateCalls.push(`create:${cid}:${title}:${titleKey}:${description}:${max}`);
+      return 'ok';
+    },
+    delete: async (cid, id) => {
+      templateCalls.push(`delete:${cid}:${id}`);
+      return id === template.id;
+    },
+    get: async (cid, id) => {
+      templateCalls.push(`get:${cid}:${id}`);
+      return id === template.id
+        ? { id: template.id, title: template.title, titleKey: 'mvp', description: template.description }
+        : null;
+    },
+  };
+}
+
 beforeEach(() => {
   enabled = true;
   calls = [];
+  templateCalls = [];
+  setCustomAwardsService(null);
   const rt: CustomAwardsRuntime = {
     store: fakeStore(),
+    templates: fakeTemplates(),
     ownsCharacter: async (accountId, characterId) => accountId === OWNER && characterId === MINE,
     enabled: () => enabled,
+    achievementRules: () => (enabled ? ACHIEVEMENT_RULES : null),
   };
   configureCustomAwardsRuntime(rt);
 });
-afterEach(() => configureCustomAwardsRuntime(null));
+afterEach(() => {
+  configureCustomAwardsRuntime(null);
+  setCustomAwardsService(null);
+});
 
 function route(method: Method, path: string): RouteDef {
   const r = routes.find((x) => x.method === method && x.path === path);
@@ -88,8 +145,14 @@ async function call(
 describe('custom-award routes: wiring', () => {
   it('every route sits behind the account bearer; the writes also parse a body', () => {
     expect(routes.map((r) => `${r.method} ${r.path}`).sort()).toEqual([
+      'DELETE /api/custom-award-templates',
+      'GET /api/custom-award-templates',
       'GET /api/custom-awards',
+      'GET /api/custom-awards/given',
+      'GET /api/custom-awards/public',
+      'POST /api/custom-award-templates',
       'POST /api/custom-awards/hide',
+      'POST /api/custom-awards/issue',
       'POST /api/custom-awards/reject',
     ]);
     for (const r of routes) {
@@ -186,5 +249,45 @@ describe('POST /api/custom-awards/hide and /reject', () => {
     expect((await call('POST', '/api/custom-awards/hide', { body })).status).toBe(404);
     expect((await call('POST', '/api/custom-awards/reject', { body })).status).toBe(404);
     expect(calls).toEqual([]);
+  });
+});
+
+describe('GET /api/custom-award-templates', () => {
+  it('lists templates for the owned character', async () => {
+    const r = await call('GET', '/api/custom-award-templates', { query: { character: String(MINE) } });
+    expect(r.status).toBe(200);
+    expect(r.body.enabled).toBe(true);
+    expect(r.body.templates).toEqual([template]);
+    expect(templateCalls).toEqual([`listTemplates:${MINE}`]);
+  });
+});
+
+describe('POST /api/custom-award-templates', () => {
+  it('creates a template', async () => {
+    const r = await call('POST', '/api/custom-award-templates', {
+      body: { character: MINE, title: 'MVP', description: 'Nice' },
+    });
+    expect(r).toEqual({ status: 200, body: { ok: true } });
+    expect(templateCalls[0]).toMatch(/^create:101:MVP:mvp:Nice:50$/);
+  });
+});
+
+describe('DELETE /api/custom-award-templates', () => {
+  it('deletes an owned template', async () => {
+    const r = await call('DELETE', '/api/custom-award-templates', {
+      body: { character: MINE, template: template.id },
+    });
+    expect(r).toEqual({ status: 200, body: { ok: true } });
+    expect(templateCalls).toEqual([`delete:${MINE}:${template.id}`]);
+  });
+});
+
+describe('POST /api/custom-awards/issue', () => {
+  it('404s when the live custom awards service is not wired', async () => {
+    const r = await call('POST', '/api/custom-awards/issue', {
+      body: { character: MINE, template: template.id, recipient: 'Ally' },
+    });
+    expect(r.status).toBe(404);
+    expect(templateCalls).toEqual([]);
   });
 });

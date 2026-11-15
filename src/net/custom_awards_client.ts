@@ -5,7 +5,11 @@
 // documented no-data values; the server owns ownership and the realm gate.
 
 import { apiUrl } from '../client_origin';
-import type { CustomAwardsSource, CustomAwardView } from '../world_api/deeds';
+import type {
+  CustomAwardGivenView,
+  CustomAwardsSource,
+  CustomAwardView,
+} from '../world_api/deeds';
 
 export interface CustomAwardsAuth {
   base: string;
@@ -38,6 +42,27 @@ function asView(raw: unknown): CustomAwardView | null {
 
 /** Parse the GET body; null when the realm is not private (`enabled: false`)
  *  or the body is not the documented shape. */
+function asGivenView(raw: unknown): CustomAwardGivenView | null {
+  const r = raw as Record<string, unknown> | null;
+  if (
+    !r ||
+    typeof r.id !== 'number' ||
+    typeof r.title !== 'string' ||
+    typeof r.description !== 'string' ||
+    typeof r.recipientName !== 'string' ||
+    typeof r.createdAt !== 'number'
+  ) {
+    return null;
+  }
+  return {
+    id: r.id,
+    title: r.title,
+    description: r.description,
+    recipientName: r.recipientName,
+    createdAt: r.createdAt,
+  };
+}
+
 export function parseCustomAwardsBody(body: unknown): CustomAwardView[] | null {
   const b = body as { enabled?: unknown; awards?: unknown } | null;
   if (b?.enabled !== true) return null;
@@ -46,6 +71,19 @@ export function parseCustomAwardsBody(body: unknown): CustomAwardView[] | null {
   const out: CustomAwardView[] = [];
   for (const raw of awards) {
     const view = asView(raw);
+    if (view) out.push(view);
+  }
+  return out;
+}
+
+export function parseCustomAwardsGivenBody(body: unknown): CustomAwardGivenView[] | null {
+  const b = body as { enabled?: unknown; awards?: unknown } | null;
+  if (b?.enabled !== true) return null;
+  const awards = b.awards;
+  if (!Array.isArray(awards)) return null;
+  const out: CustomAwardGivenView[] = [];
+  for (const raw of awards) {
+    const view = asGivenView(raw);
     if (view) out.push(view);
   }
   return out;
@@ -74,6 +112,32 @@ export function customAwardsClient(
       try {
         const res = await fetchImpl(
           apiUrl(`/api/custom-awards?character=${encodeURIComponent(a.characterId)}`, a.base),
+          { headers: { Authorization: `Bearer ${a.token}` } },
+        );
+        if (!res.ok) return null;
+        return parseCustomAwardsBody(await res.json());
+      } catch {
+        return null;
+      }
+    },
+    async listGiven() {
+      const a = auth();
+      try {
+        const res = await fetchImpl(
+          apiUrl(`/api/custom-awards/given?character=${encodeURIComponent(a.characterId)}`, a.base),
+          { headers: { Authorization: `Bearer ${a.token}` } },
+        );
+        if (!res.ok) return null;
+        return parseCustomAwardsGivenBody(await res.json());
+      } catch {
+        return null;
+      }
+    },
+    async listPublicForName(characterName) {
+      const a = auth();
+      try {
+        const res = await fetchImpl(
+          apiUrl(`/api/custom-awards/public?name=${encodeURIComponent(characterName)}`, a.base),
           { headers: { Authorization: `Bearer ${a.token}` } },
         );
         if (!res.ok) return null;

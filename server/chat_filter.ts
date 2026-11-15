@@ -1,3 +1,5 @@
+import { contentScreeningEnabled } from './content_screening_policy';
+
 // Pure, host-agnostic chat profanity/slur filtering. No SQL, no DOM — the SQL
 // layer lives in chat_filter_db.ts and the wiring in game.ts. Two tiers:
 //
@@ -240,6 +242,7 @@ export class ChatFilter {
 
   /** Normalized soft terms shipped to clients for local masking. */
   softWords(): string[] {
+    if (!contentScreeningEnabled()) return [];
     return [...this.state.soft];
   }
 
@@ -249,6 +252,7 @@ export class ChatFilter {
 
   /** The first hard term `text` hits, or null. */
   findHardHit(text: string): string | null {
+    if (!contentScreeningEnabled()) return null;
     return findHardWord(text, this.state.hard);
   }
 

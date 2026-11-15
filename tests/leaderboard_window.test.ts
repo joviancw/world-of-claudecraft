@@ -424,12 +424,15 @@ describe('players (lifetime-XP) board: the Book of Deeds title column', () => {
   it("localizes the viewer's own title into the sticky standing cell", () => {
     // The off-page sticky row mirrors rowHtml: the viewer's deed id localizes
     // through deed_i18n, '' (untitled/stale) renders an empty cell, and the cell
-    // still closes the .lb-sticky wrapper so the six-column grid stays aligned.
+    // still closes the .lb-sticky wrapper so the players grid stays aligned (an
+    // extra friend-awards span when the column is on-page).
     expect(code).toContain(
       "const deedTitle = standing.title ? deedTitleText(standing.title) : '';",
     );
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
-    expect(code).toContain('<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>');
+    expect(code).toContain(
+      '<span class="lb-deed-title">${esc(deedTitle)}</span>${colSpan}</div></div>',
+    );
     expect(code).not.toMatch(/\$\{deedTitle\}/);
   });
 });

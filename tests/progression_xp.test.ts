@@ -82,6 +82,17 @@ describe('progression/xp — updateRested (accrual + cap)', () => {
     expect(meta.restedXp).toBe(0);
   });
 
+  it('accrues away from an inn when alwaysAccrueOutOfCombat is set', () => {
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId)!;
+    teleport(sim, sim.player, -300, 0);
+    sim.player.inCombat = false;
+    meta.restedXp = 0;
+    updateRested(sim.player, meta, undefined, { alwaysAccrueOutOfCombat: true });
+    const perSecond = (0.05 * xpForLevel(sim.player.level)) / (8 * 60);
+    expect(meta.restedXp).toBeCloseTo(perSecond * DT, 6);
+  });
+
   it('does not accrue at the level cap (no XP bar to rest toward)', () => {
     const sim = makeSim();
     const meta = sim.meta(sim.playerId)!;

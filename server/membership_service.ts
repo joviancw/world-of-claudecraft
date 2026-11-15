@@ -6,6 +6,10 @@ import {
   membershipBatchAccountIds,
 } from './membership_batch';
 import { prepaidMembershipExpiresAt } from './membership_db';
+import {
+  privateRealmMembershipAllAccess,
+  privateRealmMembershipGranted,
+} from './private_realm_membership';
 import { gameSubscriptionSnapshot } from './subscription_proxy';
 
 export const MEMBERSHIP_CACHE_TTL_MS = 15_000;
@@ -140,6 +144,9 @@ export function createMembershipService(sources: MembershipSources) {
     return pending.then((value) => current(accountId, entry, value));
   }
   async function get(accountId: number): Promise<MembershipAuthorization> {
+    if (privateRealmMembershipGranted()) {
+      return privateRealmMembershipAllAccess(sources.now());
+    }
     counters.reads++;
     const entry = entryFor(accountId);
     if (entry.value && fresh(entry)) return current(accountId, entry, entry.value);
@@ -161,6 +168,10 @@ export function createMembershipService(sources: MembershipSources) {
     accountIds: readonly number[],
   ): Promise<Map<number, MembershipAuthorization>> {
     const ids = membershipBatchAccountIds(accountIds);
+    if (privateRealmMembershipGranted()) {
+      const value = privateRealmMembershipAllAccess(sources.now());
+      return new Map(ids.map((id) => [id, value]));
+    }
     const loaded = new Map<number, Promise<MembershipAuthorization>>();
     const pending: [number, MembershipEntry][] = [];
     for (const id of ids) {

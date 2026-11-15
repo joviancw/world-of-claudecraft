@@ -169,6 +169,7 @@ export const ja_JP: EnTranslations = {
     "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
+    "sentLocal": "Ran: {action}",
     "run": "実行",
     "fields": {
       "level": "レベル",
@@ -328,6 +329,10 @@ export const ja_JP: EnTranslations = {
       "hillend": {
         "label": "丘を終了",
         "description": "現在の丘を今すぐ消します。"
+      },
+      "customAwardRevealPreview": {
+        "label": "Preview friend award reveal",
+        "description": "Play the five-second achievement reveal overlay with sample copy."
       }
     }
   },
@@ -1070,6 +1075,7 @@ export const ja_JP: EnTranslations = {
     "customAward": {
       "line": "実績解除！{name} が「{title}」を獲得しました！授与者：{giver}。",
       "sent": "{name} に「{title}」を授与しました。",
+      "sentCelebrate": "Award sent!",
       "usage": "使い方：/award <名前> \"<タイトル>\" <説明>",
       "self": "自分自身に実績を授与することはできません。",
       "offensive": "その実績には使用できない言葉が含まれています。",
@@ -1094,7 +1100,42 @@ export const ja_JP: EnTranslations = {
       "removeTitle": "称号を外す",
       "wearTitleAria": "{title} を称号にする",
       "removeTitleAria": "称号 {title} を外す",
-      "actionFailed": "その変更を保存できませんでした。後でもう一度お試しください。"
+      "actionFailed": "その変更を保存できませんでした。後でもう一度お試しください。",
+      "templatesSectionTitle": "Your Awards",
+      "templatesHint": "Create an award here, then issue it to a friend by character name.",
+      "templatesEmpty": "No saved awards yet. Create one above.",
+      "templatesNew": "New award",
+      "templatesSave": "Save",
+      "templatesCancel": "Cancel",
+      "templatesTitleField": "Award title",
+      "templatesTitlePlaceholder": "Title",
+      "templatesDescField": "Award description",
+      "templatesDescPlaceholder": "Description (optional)",
+      "templatesTitleRequired": "Enter a title before saving.",
+      "templatesInvalid": "That award could not be saved. Check the length and wording.",
+      "templateCap": "You have too many saved awards. Delete one first.",
+      "templatesIssue": "Issue",
+      "templatesDelete": "Delete",
+      "templatesSend": "Send",
+      "templatesSending": "Sending…",
+      "templatesCancelIssue": "Cancel",
+      "templatesRecipientField": "Recipient character name",
+      "templatesRecipientPlaceholder": "Character name",
+      "templatesRecipientRequired": "Enter the recipient character name.",
+      "templatesIssued": "Award sent.",
+      "templatesDailyCap": "You reached the daily limit for sending awards.",
+      "givenSectionTitle": "Awards You Gave",
+      "givenEmpty": "No awards issued yet.",
+      "givenTo": "Given to {name} on {date}",
+      "inspectSectionTitle": "Friend Awards",
+      "gamingWeekendPromoOpen": "Book of Deeds: Titles and Awards",
+      "gamingWeekendPromoClose": "Dismiss weekend notice",
+      "gamingWeekendPromoEyebrow": "Gaming weekend",
+      "gamingWeekendPromoTitle": "We are giving away patches with Friend Awards this gaming weekend. Open the Book of Deeds and award your Boyz!",
+      "gamingWeekendPromoCta": "Open Book of Deeds",
+      "revealEyebrow": "Achievement Unlocked",
+      "revealRecipient": "{name} earned this honor",
+      "revealGiver": "Awarded by {name}"
     },
     "readyCheck": {
       "title": "準備確認",
@@ -2131,6 +2172,7 @@ export const ja_JP: EnTranslations = {
       "close": "閉じる",
       "tabsLabel": "ハイスコアボード",
       "tabPlayers": "プレイヤー",
+      "friendAwardsCol": "Friend awards",
       "tabGuilds": "ギルド",
       "tabDevs": "開発者",
       "guildName": "ギルド",
@@ -13703,6 +13745,7 @@ export const ja_JP: EnTranslations = {
     "stats": "統計",
     "about": "情報",
     "highscores": "ハイスコア",
+    "friendAwards": "Friend Awards",
     "wiki": "Wiki",
     "news": "ニュース",
     "download": "ダウンロード",
@@ -13743,6 +13786,31 @@ export const ja_JP: EnTranslations = {
   "highscores": {
     "title": "ハイスコアリーダーボード",
     "desc": "ワールドの偉大なチャンピオンたちを確認し、あなたの進行度と比較しましょう。"
+  },
+  "gamingWeekend": {
+    "newsHeadline": "Boyz, Welcome to Gaming Weekend!",
+    "newsLead": "I'm so happy you are here for this gaming weekend. You showed up, and that is what this whole thing is about.",
+    "newsPatchPitch": "For this gaming weekend we are giving away patches through Friend Awards. What better place to hand them out than inside the game? Award other players, collect what you earn, and show them off.",
+    "newsMissionTitle": "Your gaming weekend checklist",
+    "newsStep1": "Make an account and sign in",
+    "newsStep2": "Quest, explore, and learn the world",
+    "newsStep3": "Give patches to other players with Friend Awards (Book of Deeds)",
+    "newsStep4": "Hit level 20",
+    "newsStep5": "Run dungeons with your crew",
+    "newsStep6": "Push to endgame and flex what you earned",
+    "newsRally": "The realm is open. Hype your Boyz. Let's GOOOO!",
+    "newsCharselectBlurb": "Gaming weekend is live. Patches go out through Friend Awards. Quest, award your crew, hit 20, run dungeons, chase endgame. Let's GOOOO!",
+    "newsPageTitle": "Gaming Weekend",
+    "newsPageDesc": "Welcome to our gaming weekend: Friend Award patch giveaway, quests, dungeons, and the road to endgame."
+  },
+  "friendAwards": {
+    "title": "Friend Awards Hall",
+    "desc": "Every account on this realm and the awards players received from one another.",
+    "accountCol": "Account",
+    "countCol": "Awards",
+    "awardsCol": "Awards received",
+    "empty": "No friend awards yet.",
+    "unavailable": "Friend awards are not available on this realm."
   },
   "wiki": {
     "title": "ゲームWiki & ガイド",

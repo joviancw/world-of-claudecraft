@@ -48,6 +48,7 @@ afterEach(() => {
 describe('topLifetimeXp reads and normalizes the selected title (both arms)', () => {
   function xpRow(over: Record<string, unknown>): Record<string, unknown> {
     return {
+      character_id: 5,
       name: 'Hilda',
       class: 'warrior',
       level: 20,
@@ -183,6 +184,7 @@ describe('the shared board cache maps the read onto LeaderboardEntry (source pin
     const main = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
     const fill = main.slice(main.indexOf('async function refreshLeaderboard'));
     expect(fill.length).toBeGreaterThan(0);
-    expect(fill.slice(0, 700)).toContain('title: r.activeTitle');
+    expect(fill.slice(0, 1200)).toContain('title: r.activeTitle');
+    expect(fill).toContain('friendAwards');
   });
 });

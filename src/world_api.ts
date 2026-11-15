@@ -371,6 +371,11 @@ export type {
   DailyRewardTaskView,
 } from './world_api/daily_rewards';
 export type {
+  CustomAwardGivenView,
+  CustomAwardIssueOutcome,
+  CustomAwardTemplateCreateOutcome,
+  CustomAwardTemplatesSource,
+  CustomAwardTemplateView,
   CustomAwardsSource,
   CustomAwardView,
   DeedsLeaderboardEntry,
@@ -452,6 +457,7 @@ export type {
   GuildLeaderboardEntry,
   GuildRosterEntry,
   GuildRosterInfo,
+  FriendAwardLeaderboardEntry,
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {

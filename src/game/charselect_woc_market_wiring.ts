@@ -15,6 +15,7 @@
 // character-select setup, independent of (and before) the online entry point
 // that calls attachWocMarketExchange.
 
+import { isCommerceChromeHiddenOnDocument } from '../ui/commerce_chrome_policy';
 import { WocMarketClient } from '../net/woc_market_sdk';
 import {
   type CharselectMarketClient,
@@ -39,6 +40,7 @@ export async function attachCharselectWocMarket(
   deps: CharselectWocMarketWiringDeps,
   shell: WocMarketShell = defaultWocMarketShell(),
 ): Promise<boolean> {
+  if (isCommerceChromeHiddenOnDocument()) return false;
   if (!(await wocMarketAttachAllowed(shell))) return false;
   deps.attach(new WocMarketClient({ token: () => deps.api.token, base: deps.api.base }));
   return true;
@@ -59,6 +61,7 @@ export interface CharselectWocMarketUiDeps {
  *  firewall, so every piece beyond the injected DOM accessors lives here
  *  rather than as inline construction in main.ts. */
 export function initCharselectWocMarket(deps: CharselectWocMarketUiDeps): void {
+  if (isCommerceChromeHiddenOnDocument()) return;
   let client: CharselectMarketClient | null = null;
   const panel = new CharselectWocMarketPanel({
     root: deps.root,
@@ -72,6 +75,7 @@ export function initCharselectWocMarket(deps: CharselectWocMarketUiDeps): void {
   void attachCharselectWocMarket({
     api: deps.api,
     attach: (c) => {
+      if (isCommerceChromeHiddenOnDocument()) return;
       client = c;
       deps.launcherButton()?.removeAttribute('hidden');
     },

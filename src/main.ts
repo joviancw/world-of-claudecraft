@@ -16,6 +16,7 @@ import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { installClientUpdate, searchClientUpdates } from './client_update_search';
 import { markEntryTightMode } from './device_memory_hint';
+import { COMMUNITY_DISCORD_INVITE_URL } from './discord_community_url';
 import { startDiscordLogin } from './discord_login_start';
 import {
   syncAppViewport as syncAppViewportShared,
@@ -541,6 +542,10 @@ import {
 } from './ui/graphics_choice_core';
 import { promptGraphicsChoiceOnFirstLogin } from './ui/graphics_choice_prompt';
 import { installGraphicsRestoreNote } from './ui/graphics_restore_note_controller';
+import {
+  loadFriendAwardsInto,
+  syncFriendAwardsNavVisible,
+} from './ui/friend_awards_board';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -597,6 +602,22 @@ import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overl
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
+import {
+  COMMERCE_CHROME_HIDDEN_BODY_CLASS,
+  isCommerceChromeHiddenOnDocument,
+  removeWalletShellChrome,
+  syncCommerceChromeFromPrivateRealmAdvert,
+} from './ui/commerce_chrome_policy';
+import { syncMembershipGearClaimsFromStatus } from './ui/private_realm_membership_gear';
+import {
+  installHomepageHeaderReserveSync,
+  syncHomepageHeaderReserve,
+} from './ui/homepage_header_reserve';
+import {
+  loadGamingWeekendCharselectNewsInto,
+  loadGamingWeekendNewsInto,
+  paintGamingWeekendNewsPageChrome,
+} from './ui/private_realm_weekend_news';
 import { shouldShowStorePromo } from './ui/store_promo_card';
 import { talentRowOptionIconRef } from './ui/talent_icons';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
@@ -1517,9 +1538,15 @@ async function startGame(
     // One-time software-rendering notice (WARP/SwiftShader): the Renderer
     // constructor ran initGfxTier, so the adapter verdict is resolved by now.
     initSoftwareRenderNotice(DESKTOP_APP);
+    const commerceChromeHidden = online
+      ? await syncCommerceChromeFromPrivateRealmAdvert(() => api.privateRealmAdvert())
+      : false;
+    if (online) await syncMembershipGearClaimsFromStatus(() => api.realmStatusAdvert());
     loadPhaseStart('hud-ctor');
     hud = new Hud(world, renderer, keybinds, {
-      dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
+      dailyRewardsEnabled:
+        !commerceChromeHidden && (NATIVE_APP ? await walletCapabilityReady : true),
+      commerceChromeHidden,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
     });
@@ -3249,17 +3276,18 @@ async function startGame(
         desktopAuthorize: desktopWalletBrowserHandoffAvailable() ? wocDesktopAuthorize : null,
       },
     }).catch((err) => console.warn('[woc] exchange attach failed', err));
-    if (!NATIVE_APP) {
+    const storePromoEligible = shouldShowStorePromo({
+      nativeApp: NATIVE_APP,
+      desktopApp: DESKTOP_APP,
+      mobileTouch: document.body.classList.contains('mobile-touch'),
+    });
+    if (!NATIVE_APP && !hud.commerceChromeSuppressed()) {
       hud.attachClaudium(claudiumHooks);
-      if (
-        shouldShowStorePromo({
-          nativeApp: NATIVE_APP,
-          desktopApp: DESKTOP_APP,
-          mobileTouch: document.body.classList.contains('mobile-touch'),
-        })
-      ) {
+      if (storePromoEligible) {
         hud.attachStorePromoCard();
       }
+    } else if (!NATIVE_APP && hud.commerceChromeSuppressed() && storePromoEligible) {
+      hud.attachPrivateRealmAwardsPromo();
     }
   }
   const bgFlagKey = createBgFlagKey(world);
@@ -5193,6 +5221,7 @@ const RESET_TOKEN = (() => {
 const showStartPanel = createStartPanelNavigation();
 let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
+let privateRealmSignup = false;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
 
@@ -5607,7 +5636,12 @@ function show(el: string): void {
   // Mount the Turnstile widget the first time the login/register form appears.
   if (el === '#login-panel') {
     ensureTurnstile();
-    authModeApply?.('login');
+    void syncCommerceChromeFromPrivateRealmAdvert(() => api.privateRealmAdvert()).then((on) => {
+      privateRealmSignup = on;
+      syncFriendAwardsNavVisible(on);
+      authModeApply?.('login');
+    });
+    void syncMembershipGearClaimsFromStatus(() => api.realmStatusAdvert());
   }
 
   const isPlayPanel =
@@ -5625,9 +5659,22 @@ function show(el: string): void {
   // The character-select news panel loads when its screen opens: entry is the
   // moment the player can actually read it, and the NEW-badge marker should
   // advance only then.
+  if (
+    el === '#charselect-panel' ||
+    el === '#charcreate-panel' ||
+    el === '#login-panel' ||
+    el === '#realm-panel'
+  ) {
+    requestAnimationFrame(() => syncHomepageHeaderReserve());
+  }
+
   if (el === '#charselect-panel') {
     startShaderWarmup();
-    void loadCharselectNews($('#charselect-news-feed'), () => api.releases(20));
+    if (document.body.classList.contains(COMMERCE_CHROME_HIDDEN_BODY_CLASS)) {
+      loadGamingWeekendCharselectNewsInto($('#charselect-news-feed'));
+    } else {
+      void loadCharselectNews($('#charselect-news-feed'), () => api.releases(20));
+    }
   }
 
   // Reset currently rendered classes to force re-render/animation when opening a panel
@@ -5957,7 +6004,7 @@ function setupAccountPortal(): void {
 // setupAccountPortal to keep each concern legible; called once on first wiring.
 function setupSecuritySection(): void {
   // ── Verified email change ──
-  ($('#account-change-email-form') as HTMLFormElement).addEventListener('submit', async (e) => {
+  document.getElementById('account-change-email-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const pass = ($('#account-change-email-pass') as HTMLInputElement).value;
     const email = ($('#account-change-email-new') as HTMLInputElement).value;
@@ -5980,6 +6027,7 @@ function setupSecuritySection(): void {
   });
 
   // ── Two-factor: enrolment wizard ──
+  if (!document.getElementById('account-2fa')) return;
   const twoFaMsg = '#account-2fa-msg';
   const show = (sel: string, visible: boolean) => {
     const el = document.querySelector(sel) as HTMLElement | null;
@@ -7114,7 +7162,7 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
   if (jsonLd) {
     const sameAs = [
       'https://github.com/levy-street/world-of-claudecraft',
-      'https://discord.com/invite/worldofclaudecraft',
+      COMMUNITY_DISCORD_INVITE_URL,
       'https://www.youtube.com/@WoClaudeCraft',
       'https://x.com/WoClaudecraft',
       'https://www.instagram.com/worldofclaudecraft/',
@@ -7304,11 +7352,20 @@ async function loadHighscores(): Promise<void> {
   await loadHighscoresInto($('#hs-leaderboard'), () => api.leaderboard('global', 100));
 }
 
+async function loadFriendAwardsHall(): Promise<void> {
+  await loadFriendAwardsInto($('#fa-hall'), () => api.friendAwardsHall());
+}
+
 // News & Updates: published GitHub releases, proxied + cached by the server.
 // Re-fetched each time the view is opened (the server caches, so it is cheap).
 // The sanitizing renderer + fetch/paint loop live in ./ui/news_feed (extracted
 // out of this firewall file); this call site just supplies the host + fetcher.
 async function loadNews(): Promise<void> {
+  if (document.body.classList.contains(COMMERCE_CHROME_HIDDEN_BODY_CLASS)) {
+    loadGamingWeekendNewsInto($('#news-feed'));
+    paintGamingWeekendNewsPageChrome();
+    return;
+  }
   await loadNewsInto($('#news-feed'), () => api.releases(20));
 }
 
@@ -8096,6 +8153,7 @@ window.addEventListener('message', (e: MessageEvent) => {
 });
 
 async function refreshGithubLinkStatus(): Promise<void> {
+  if (isCommerceChromeHiddenOnDocument()) return;
   const group = document.getElementById('cs-github-group');
   if (!group) return;
   if (!api.token) {
@@ -8471,6 +8529,7 @@ function wireRecoveryEmailModal(): void {
 // getAccount(). Never blocks realm entry on a transient whoami failure.
 async function maybePromptRecoveryEmail(): Promise<void> {
   if (!api.token) return;
+  if (await api.privateRealmAdvert()) return;
   if (api.emailMissing === false) return;
   if (api.emailMissing === undefined) {
     try {
@@ -8780,21 +8839,24 @@ async function switchWallet(): Promise<void> {
 
 async function wireWallet(): Promise<void> {
   setWalletUiEnabled(false);
+  const commerceChromeHidden = await syncCommerceChromeFromPrivateRealmAdvert(() =>
+    api.privateRealmAdvert(),
+  );
+  await syncMembershipGearClaimsFromStatus(() => api.realmStatusAdvert());
   await walletCapabilityReady;
-  document.body.classList.toggle('seeker-wallet-enabled', NATIVE_APP && WALLET_ENABLED);
-  if (NATIVE_APP && WALLET_ENABLED) {
+  const walletEnabled = WALLET_ENABLED && !commerceChromeHidden;
+  document.body.classList.toggle('seeker-wallet-enabled', NATIVE_APP && walletEnabled);
+  if (NATIVE_APP && walletEnabled) {
     const dailyRewardsButton = document.getElementById('mobile-daily-rewards');
     if (dailyRewardsButton) {
       document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton);
     }
   }
-  setWalletUiEnabled(WALLET_ENABLED);
-  // Feature-gate: when explicitly disabled, remove the wallet row entirely and
-  // never download the wallet chunk.
-  if (!WALLET_ENABLED) {
-    document.querySelector('.cs-wallet')?.remove();
-    document.querySelector('.cs-wallet-hidden-note')?.remove();
-    document.querySelector('.account-wallet-card')?.remove();
+  setWalletUiEnabled(walletEnabled);
+  // Feature-gate: when explicitly disabled or on a private realm, remove wallet
+  // rows and never download the wallet chunk.
+  if (!walletEnabled) {
+    removeWalletShellChrome();
     updateWalletButton();
     return;
   }
@@ -8960,7 +9022,13 @@ function wireStartScreens(): Promise<void> {
   // owns the fallback.
   for (const ensure of CONTENT_LOCALE_CHANNEL_ENSURERS) void ensure(bootLang).catch(() => {});
   hydrateIcons();
+  installHomepageHeaderReserveSync();
+  syncHomepageHeaderReserve();
   void loadProjectStats(() => api.projectStats());
+  void syncCommerceChromeFromPrivateRealmAdvert(() => api.privateRealmAdvert()).then((on) => {
+    syncFriendAwardsNavVisible(on);
+  });
+  void syncMembershipGearClaimsFromStatus(() => api.realmStatusAdvert());
   wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();
@@ -9411,8 +9479,11 @@ function wireStartScreens(): Promise<void> {
           return;
         }
       } else {
-        const email = ($('#login-email') as unknown as HTMLInputElement).value.trim();
+        const email = privateRealmSignup
+          ? ''
+          : ($('#login-email') as unknown as HTMLInputElement).value.trim();
         const optIn =
+          !privateRealmSignup &&
           ($('#login-marketing') as unknown as HTMLInputElement | null)?.checked === true;
         const registered = await api.register(
           username,
@@ -9494,18 +9565,16 @@ function wireStartScreens(): Promise<void> {
     );
     $('#btn-auth-toggle').textContent = t(isLogin ? 'auth.createAccount' : 'auth.logIn');
     passInput.setAttribute('autocomplete', isLogin ? 'current-password' : 'new-password');
-    // Email is mandatory at signup only: show + require it in register mode, hide +
-    // drop `required` in login mode so it never blocks a login submit. (An element
-    // inside a display:none wrapper is still constraint-validated, so we toggle
-    // `required` on the input itself, not just the wrapper's `hidden`.)
+    // Email at signup: stock realms show + require it; private realms hide it
+    // entirely. Login mode always hides it. (A hidden input with `required` still
+    // blocks submit, so drop `required` when the field is hidden.)
     const emailField = $('#login-email-field') as HTMLElement;
     const emailInput = $('#login-email') as HTMLInputElement;
-    emailField.hidden = isLogin;
-    // The marketing opt-in is register-only too; never required, so the
-    // wrapper's hidden is enough.
+    const hideSignupEmail = privateRealmSignup;
+    emailField.hidden = isLogin || hideSignupEmail;
     const marketingField = $('#login-marketing-field') as HTMLElement | null;
-    if (marketingField) marketingField.hidden = isLogin;
-    if (isLogin) {
+    if (marketingField) marketingField.hidden = isLogin || hideSignupEmail;
+    if (isLogin || hideSignupEmail) {
       emailInput.removeAttribute('required');
       emailInput.classList.remove('user-invalid-fallback');
       emailInput.removeAttribute('aria-invalid');
@@ -9929,6 +9998,7 @@ function wireStartScreens(): Promise<void> {
   // Main Navigation View Switching
   const navBtnPlay = $('#nav-btn-play');
   const navBtnHighscores = $('#nav-btn-highscores');
+  const navBtnFriendAwards = $('#nav-btn-friend-awards');
   const navBtnWiki = $('#nav-btn-wiki');
   const navBtnNews = $('#nav-btn-news');
   const navBtnDownload = $('#nav-btn-download');
@@ -10013,6 +10083,10 @@ function wireStartScreens(): Promise<void> {
   setupNavBtn(navBtnHighscores, '#highscores-view', () => {
     switchMainView('#highscores-view');
     void loadHighscores();
+  });
+  setupNavBtn(navBtnFriendAwards, '#friend-awards-view', () => {
+    switchMainView('#friend-awards-view');
+    void loadFriendAwardsHall();
   });
   // The wiki is the curated guide SPA at /wiki (its own page), so this nav item
   // opens separately so the player's login state remains in this tab.

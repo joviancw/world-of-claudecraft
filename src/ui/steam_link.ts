@@ -2,6 +2,7 @@ import type { Api } from '../net/online';
 import { DESKTOP_APP } from '../net/online';
 import type { DesktopBridge } from '../runtime';
 import { desktopBridge } from '../runtime';
+import { isCommerceChromeHiddenOnDocument } from './commerce_chrome_policy';
 import { userFacingApiError } from './api_error_i18n';
 import { t } from './i18n';
 import { syncSteamWishlistVisibility } from './steam_wishlist';
@@ -50,6 +51,10 @@ async function steamTicketCapability(bridge: DesktopBridge | null): Promise<bool
 }
 
 export async function refreshSteamLinkStatus(api: Api): Promise<void> {
+  if (isCommerceChromeHiddenOnDocument()) {
+    document.getElementById('cs-steam-group')?.setAttribute('hidden', '');
+    return;
+  }
   const group = document.getElementById('cs-steam-group');
   if (!group) return;
   if (!api.token) {

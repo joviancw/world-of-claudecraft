@@ -107,7 +107,7 @@
   "inLanguage": "en",
   "sameAs": [
     "https://github.com/levy-street/world-of-claudecraft",
-    "https://discord.com/invite/worldofclaudecraft"
+    "https://discord.com/channels/953442947427348493/"
   ]
 }
 </script>
@@ -938,6 +938,9 @@
             <li class="nav-item">
               <button type="button" class="nav-link" id="nav-btn-highscores" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
             </li>
+            <li class="nav-item" id="nav-item-friend-awards" hidden>
+              <button type="button" class="nav-link" id="nav-btn-friend-awards" aria-pressed="false" data-i18n="nav.friendAwards">Friend Awards</button>
+            </li>
             <li class="nav-item">
               <button type="button" class="nav-link" id="nav-btn-wiki" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
             </li>
@@ -1001,11 +1004,11 @@
           <h2 class="website-headline" data-i18n="landing.headline">Adventure with friends.</h2>
           <p class="website-intro" data-i18n="guide.home.subtitle">Explore the world, take on quests, and tackle dungeons with friends.</p>
           <div class="website-community-links">
-          <a class="website-community" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer">
+          <a class="website-community" href="https://discord.com/channels/953442947427348493/" target="_blank" rel="noopener noreferrer">
             <span data-i18n="footer.discordLabel">Join the Discord</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
           </a>
-          <a class="website-community" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
+          <a class="website-community shell-github-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
             <span data-i18n="landing.contribute">Contribute to the game</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
           </a>
@@ -1372,6 +1375,21 @@
         </div>
       </section>
 
+      <section id="friend-awards-view" class="view-section" hidden aria-hidden="true">
+        <div class="parchment-panel fa-panel">
+          <div class="skeleton-icon-wrapper">
+            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
+              <path fill="currentColor" d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5m14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+            </svg>
+          </div>
+          <h2 class="skeleton-title" data-i18n="friendAwards.title">Friend Awards Hall</h2>
+          <p class="skeleton-desc" data-i18n="friendAwards.desc">Every account on this realm and the awards players received from one another.</p>
+          <div id="fa-hall" class="fa-hall" aria-live="polite">
+            <div class="fa-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
+          </div>
+        </div>
+      </section>
+
       <section id="news-view" class="view-section" hidden aria-hidden="true">
         <div class="parchment-panel news-panel">
           <div class="skeleton-icon-wrapper">
@@ -1443,11 +1461,11 @@
         <a class="social-link steam-wishlist steam-wishlist-social" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page">
           <span data-i18n="hudChrome.steam.wishlist">Wishlist on Steam</span>
         </a>
-        <a class="social-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.githubProject" aria-label="Open the World of ClaudeCraft GitHub project">
+        <a class="social-link shell-github-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.githubProject" aria-label="Open the World of ClaudeCraft GitHub project">
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           <span data-i18n="footer.githubLabel">Open Source Project</span>
         </a>
-        <a class="social-link" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
+        <a class="social-link" href="https://discord.com/channels/953442947427348493/" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/></svg>
           <span data-i18n="footer.discordLabel">Join the Discord</span>
         </a>

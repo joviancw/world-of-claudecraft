@@ -19,6 +19,8 @@ export interface DevCommandAction {
   labelKey: TranslationKey;
   descriptionKey: TranslationKey;
   command(values: DevCommandValues): string | null;
+  /** Client-only preview; never sent to the server chat command lane. */
+  localOnly?: boolean;
 }
 
 const SAFE_TOKEN = /^[a-z0-9_]+$/i;
@@ -335,6 +337,14 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     labelKey: 'devCommand.actions.hillend.label',
     descriptionKey: 'devCommand.actions.hillend.description',
     command: fixed('/dev hill end'),
+  },
+  {
+    id: 'customAwardRevealPreview',
+    category: 'scenarios',
+    localOnly: true,
+    labelKey: 'devCommand.actions.customAwardRevealPreview.label',
+    descriptionKey: 'devCommand.actions.customAwardRevealPreview.description',
+    command: () => null,
   },
 ];
 

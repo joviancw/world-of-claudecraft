@@ -29,6 +29,10 @@ import {
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
 import { localizeRiftPlaceName } from './rift_text_i18n';
+import {
+  parseCustomAwardAnnouncement,
+  parseCustomAwardSent,
+} from './custom_award_log_feedback';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
 
@@ -59,12 +63,16 @@ const CUSTOM_AWARD_EXACT: Record<string, TranslationKey> = {
 export function localizeCustomAwardText(text: string): string | null {
   const key = CUSTOM_AWARD_EXACT[text];
   if (key) return t(key);
-  let match = /^ACHIEVEMENT UNLOCKED! (\S+) has earned "([^"]+)"! Awarded by (\S+)\.$/.exec(text);
-  if (match)
-    return t('hudChrome.customAward.line', { name: match[1], title: match[2], giver: match[3] });
-  match = /^You awarded "([^"]+)" to (\S+)\.$/.exec(text);
-  if (match) return t('hudChrome.customAward.sent', { title: match[1], name: match[2] });
-  match = /^Achievement (titles|descriptions) are limited to (\d+) characters\.$/.exec(text);
+  const announced = parseCustomAwardAnnouncement(text);
+  if (announced)
+    return t('hudChrome.customAward.line', {
+      name: announced.recipient,
+      title: announced.title,
+      giver: announced.giver,
+    });
+  const sent = parseCustomAwardSent(text);
+  if (sent) return t('hudChrome.customAward.sent', { title: sent.title, name: sent.recipient });
+  let match = /^Achievement (titles|descriptions) are limited to (\d+) characters\.$/.exec(text);
   if (match)
     return t(
       match[1] === 'titles'

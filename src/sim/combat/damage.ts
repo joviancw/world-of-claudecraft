@@ -61,7 +61,7 @@ import {
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { isBuddyMob } from '../pet/buddy_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
-import { privateRealmXpAmount } from '../private_realm';
+import { privateRealmAlwaysRestedKills, privateRealmXpAmount } from '../private_realm';
 import {
   recordCorpseHarvestDeath,
   releaseCorpseHarvest,
@@ -2054,10 +2054,15 @@ export function grantXp(
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.
   let restedBonus = 0;
-  if (opts?.fromKill && p.level < MAX_LEVEL && meta.restedXp > 0) {
-    restedBonus = Math.min(Math.floor(meta.restedXp), amount);
-    meta.restedXp -= restedBonus;
-    amount += restedBonus;
+  if (opts?.fromKill && p.level < MAX_LEVEL) {
+    if (privateRealmAlwaysRestedKills(ctx.cfg.privateRealm)) {
+      restedBonus = amount;
+      amount += restedBonus;
+    } else if (meta.restedXp > 0) {
+      restedBonus = Math.min(Math.floor(meta.restedXp), amount);
+      meta.restedXp -= restedBonus;
+      amount += restedBonus;
+    }
   }
   if (
     (membershipActive(meta, ctx.time) && wearsMembershipArmour(meta.equipment)) ||

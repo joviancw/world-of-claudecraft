@@ -417,6 +417,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       attachTooltip: (el, build) => {
         attachedTooltips.push({ el, build });
       },
+      customAwardsForPlayer: async () => null,
     });
     currentWindow = win;
     win.openInspect(e, 1_700_000_000_000, selfStanding, selfEquippedInstances, look);

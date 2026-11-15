@@ -6141,6 +6141,16 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  .store-promo-card--gaming-weekend .store-promo-card-copy {
+    max-width: 64%;
+  }
+  .store-promo-card--gaming-weekend .store-promo-card-title {
+    margin-top: 1.5%;
+    font-size: 5.6cqw;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
   .store-promo-card-close {
     position: absolute;
     top: 4px;
@@ -9618,7 +9628,24 @@
      order), which is the same mechanism the body.native-app block above uses. */
   body.steam-wishlist-pending .steam-wishlist,
   body.native-app .steam-wishlist,
-  body.steam-build .steam-wishlist {
+  body.steam-build .steam-wishlist,
+  body.commerce-chrome-hidden .steam-wishlist {
+    display: none !important;
+  }
+  body.commerce-chrome-hidden a.shell-github-link,
+  body.commerce-chrome-hidden #cs-github-group,
+  body.commerce-chrome-hidden .news-link[href*='github.com'],
+  body.commerce-chrome-hidden .news-view-all a[href*='github.com'] {
+    display: none !important;
+  }
+  body.commerce-chrome-hidden #charselect-panel .cs-wallet-group,
+  body.commerce-chrome-hidden #charselect-panel .cs-wallet-hidden-note,
+  body.commerce-chrome-hidden .account-wallet-card,
+  body.commerce-chrome-hidden #player-card-modal .pc-wallet-toggle,
+  body.commerce-chrome-hidden #claudium-window :is(.cl-wallet-connect, .cl-wallet-balances),
+  body.commerce-chrome-hidden #woc-market-window :is(.wm-banner-wallet, .wm-wallet-balance),
+  body.commerce-chrome-hidden #rift-forge-window .rf-wallet,
+  body.commerce-chrome-hidden .dr-wallet-card {
     display: none !important;
   }
 

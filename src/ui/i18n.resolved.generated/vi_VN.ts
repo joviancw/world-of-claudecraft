@@ -169,6 +169,7 @@ export const vi_VN: EnTranslations = {
     "serverRequirement": "Lệnh gian lận phía máy chủ vẫn cần ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
     "sent": "Đã gửi: {command}",
+    "sentLocal": "Ran: {action}",
     "run": "Chạy",
     "fields": {
       "level": "Cấp",
@@ -328,6 +329,10 @@ export const vi_VN: EnTranslations = {
       "hillend": {
         "label": "Kết Thúc Gò Đất",
         "description": "Làm cho gò đất hiện tại rơi xuống ngay bây giờ."
+      },
+      "customAwardRevealPreview": {
+        "label": "Preview friend award reveal",
+        "description": "Play the five-second achievement reveal overlay with sample copy."
       }
     }
   },
@@ -1070,6 +1075,7 @@ export const vi_VN: EnTranslations = {
     "customAward": {
       "line": "ACHIEVEMENT UNLOCKED! {name} has earned \"{title}\"! Awarded by {giver}.",
       "sent": "You awarded \"{title}\" to {name}.",
+      "sentCelebrate": "Award sent!",
       "usage": "Usage: /award <name> \"<title>\" <description>",
       "self": "You cannot award an achievement to yourself.",
       "offensive": "That achievement contains a word that is not allowed.",
@@ -1094,7 +1100,42 @@ export const vi_VN: EnTranslations = {
       "removeTitle": "Remove title",
       "wearTitleAria": "Wear {title} as your title",
       "removeTitleAria": "Stop wearing {title} as your title",
-      "actionFailed": "That change could not be saved. Try again later."
+      "actionFailed": "That change could not be saved. Try again later.",
+      "templatesSectionTitle": "Your Awards",
+      "templatesHint": "Create an award here, then issue it to a friend by character name.",
+      "templatesEmpty": "No saved awards yet. Create one above.",
+      "templatesNew": "New award",
+      "templatesSave": "Save",
+      "templatesCancel": "Cancel",
+      "templatesTitleField": "Award title",
+      "templatesTitlePlaceholder": "Title",
+      "templatesDescField": "Award description",
+      "templatesDescPlaceholder": "Description (optional)",
+      "templatesTitleRequired": "Enter a title before saving.",
+      "templatesInvalid": "That award could not be saved. Check the length and wording.",
+      "templateCap": "You have too many saved awards. Delete one first.",
+      "templatesIssue": "Issue",
+      "templatesDelete": "Delete",
+      "templatesSend": "Send",
+      "templatesSending": "Sending…",
+      "templatesCancelIssue": "Cancel",
+      "templatesRecipientField": "Recipient character name",
+      "templatesRecipientPlaceholder": "Character name",
+      "templatesRecipientRequired": "Enter the recipient character name.",
+      "templatesIssued": "Award sent.",
+      "templatesDailyCap": "You reached the daily limit for sending awards.",
+      "givenSectionTitle": "Awards You Gave",
+      "givenEmpty": "No awards issued yet.",
+      "givenTo": "Given to {name} on {date}",
+      "inspectSectionTitle": "Friend Awards",
+      "gamingWeekendPromoOpen": "Book of Deeds: Titles and Awards",
+      "gamingWeekendPromoClose": "Dismiss weekend notice",
+      "gamingWeekendPromoEyebrow": "Gaming weekend",
+      "gamingWeekendPromoTitle": "We are giving away patches with Friend Awards this gaming weekend. Open the Book of Deeds and award your Boyz!",
+      "gamingWeekendPromoCta": "Open Book of Deeds",
+      "revealEyebrow": "Achievement Unlocked",
+      "revealRecipient": "{name} earned this honor",
+      "revealGiver": "Awarded by {name}"
     },
     "readyCheck": {
       "title": "Kiểm tra sẵn sàng",
@@ -2131,6 +2172,7 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng",
       "tabsLabel": "Bảng điểm cao",
       "tabPlayers": "Người Chơi",
+      "friendAwardsCol": "Friend awards",
       "tabGuilds": "Bang Hội",
       "tabDevs": "Nhà phát triển",
       "guildName": "Bang Hội",
@@ -13703,6 +13745,7 @@ export const vi_VN: EnTranslations = {
     "stats": "Thống Kê",
     "about": "Giới Thiệu",
     "highscores": "Bảng Điểm Cao",
+    "friendAwards": "Friend Awards",
     "wiki": "Wiki",
     "news": "Tin Tức",
     "download": "Tải Về",
@@ -13743,6 +13786,31 @@ export const vi_VN: EnTranslations = {
   "highscores": {
     "title": "Bảng Xếp Hạng Điểm Cao",
     "desc": "Theo dõi những nhà vô địch vĩ đại nhất của thế giới và so sánh tiến độ của bạn."
+  },
+  "gamingWeekend": {
+    "newsHeadline": "Boyz, Welcome to Gaming Weekend!",
+    "newsLead": "I'm so happy you are here for this gaming weekend. You showed up, and that is what this whole thing is about.",
+    "newsPatchPitch": "For this gaming weekend we are giving away patches through Friend Awards. What better place to hand them out than inside the game? Award other players, collect what you earn, and show them off.",
+    "newsMissionTitle": "Your gaming weekend checklist",
+    "newsStep1": "Make an account and sign in",
+    "newsStep2": "Quest, explore, and learn the world",
+    "newsStep3": "Give patches to other players with Friend Awards (Book of Deeds)",
+    "newsStep4": "Hit level 20",
+    "newsStep5": "Run dungeons with your crew",
+    "newsStep6": "Push to endgame and flex what you earned",
+    "newsRally": "The realm is open. Hype your Boyz. Let's GOOOO!",
+    "newsCharselectBlurb": "Gaming weekend is live. Patches go out through Friend Awards. Quest, award your crew, hit 20, run dungeons, chase endgame. Let's GOOOO!",
+    "newsPageTitle": "Gaming Weekend",
+    "newsPageDesc": "Welcome to our gaming weekend: Friend Award patch giveaway, quests, dungeons, and the road to endgame."
+  },
+  "friendAwards": {
+    "title": "Friend Awards Hall",
+    "desc": "Every account on this realm and the awards players received from one another.",
+    "accountCol": "Account",
+    "countCol": "Awards",
+    "awardsCol": "Awards received",
+    "empty": "No friend awards yet.",
+    "unavailable": "Friend awards are not available on this realm."
   },
   "wiki": {
     "title": "Wiki & Hướng Dẫn Trò Chơi",

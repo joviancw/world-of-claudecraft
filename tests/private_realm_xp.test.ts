@@ -58,6 +58,17 @@ describe('grantXp on a private realm', () => {
     expect(s.xp).toBe(100);
   });
 
+  it('doubles kill XP with alwaysRestedKills even when the pool is empty', () => {
+    const s = sim(
+      resolvePrivateRealmRules({ leveling: { alwaysRestedKills: true } }),
+    );
+    const meta = primaryMeta(s);
+    meta.restedXp = 0;
+    s.grantXp(40, meta, { fromKill: true });
+    expect(s.xp).toBe(80);
+    expect(meta.restedXp).toBe(0);
+  });
+
   it('levels through the normal level-up path, never by setting the level', () => {
     const s = sim(resolvePrivateRealmRules({ leveling: { questXpMultiplier: 2 } }));
     s.grantXp(xpForLevel(1));
@@ -78,6 +89,18 @@ describe('privateRealmRulesFromEnv', () => {
     expect(rules?.dungeons).toEqual(PRIVATE_REALM_DEFAULTS.dungeons);
   });
 
+  it('enables always rested accrual when PRIVATE_REALM_ALWAYS_RESTED=1', () => {
+    expect(
+      privateRealmRulesFromEnv({ PRIVATE_REALM: '1' })?.leveling.alwaysRestedAccrual,
+    ).toBe(false);
+    const rules = privateRealmRulesFromEnv({
+      PRIVATE_REALM: '1',
+      PRIVATE_REALM_ALWAYS_RESTED: '1',
+    });
+    expect(rules?.leveling.alwaysRestedAccrual).toBe(true);
+    expect(rules?.leveling.alwaysRestedKills).toBe(true);
+  });
+
   it('reads numeric overrides and ignores malformed ones with a warning', () => {
     const warnings: string[] = [];
     const rules = privateRealmRulesFromEnv(
@@ -92,7 +115,7 @@ describe('privateRealmRulesFromEnv', () => {
     );
     expect(rules?.leveling.killXpMultiplier).toBe(1.75);
     expect(rules?.leveling.questXpMultiplier).toBe(1);
-    expect(rules?.dungeons.targetPlayers).toBe(8);
+    expect(rules?.dungeons.targetPlayers).toBe(9);
     expect(rules?.dungeons.healthMultiplier).toBe(2);
     expect(warnings).toHaveLength(2);
   });

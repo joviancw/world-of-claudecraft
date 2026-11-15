@@ -1,5 +1,7 @@
 # Private Realm Progress
 
+**Local setup and playtesting:** [PRIVATE_REALM_TESTING.md](PRIVATE_REALM_TESTING.md)
+
 Running status of the private eight-player realm fork. Branch:
 `feature/private-realm` (worktree `../woc-private-realm`), cut from `main`
 (which carries the v0.45.8 release merge).
@@ -19,11 +21,16 @@ One rules object, `PrivateRealmRules` in `src/sim/private_realm.ts`
 | `PRIVATE_REALM` | unset | `1` enables the rule set |
 | `PRIVATE_REALM_KILL_XP` | 1 | kill XP multiplier |
 | `PRIVATE_REALM_QUEST_XP` | 1 | every non-kill XP award (quests, world quests, delves, crafting, gathering) |
-| `PRIVATE_REALM_DUNGEON_PLAYERS` | 8 | largest raid group admitted to a five-player dungeon |
+| `PRIVATE_REALM_DUNGEON_PLAYERS` | 9 | largest raid group admitted to a five-player dungeon |
 | `PRIVATE_REALM_DUNGEON_MIN_LEVEL` | 20 | every raid member must be this level to enter a five-player dungeon as a raid |
 | `PRIVATE_REALM_DUNGEON_HP` | 1.5 | enemy health multiplier for a raid-claimed five-player dungeon |
 | `PRIVATE_REALM_DUNGEON_DMG` | 1.15 | enemy damage multiplier for the same |
 | `PRIVATE_REALM_AWARD_DAILY_CAP` | 10 | custom awards one character may create per rolling day |
+
+With `PRIVATE_REALM=1`, every account reads as fully subscribed for gameplay
+(`server/private_realm_membership.ts` via `getMembership`): adaptive armour,
+membership gear, extra character slots, and no lock on membership-slot
+characters. No Stripe or economy service is required on a friends' server.
 
 `maxLevel` from the original proposal is not a knob: `MAX_LEVEL` is already 20
 in `src/sim/types.ts`.

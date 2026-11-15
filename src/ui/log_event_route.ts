@@ -2,6 +2,7 @@
 // Log. Pure predicate consumed by hud.ts's `case 'log':` dispatch.
 
 import { DROWNED_TEMPLE_GATES } from '../sim/content/drowned_temple';
+import { parseCustomAwardAnnouncement } from './custom_award_log_feedback';
 import { isSunderCompletionLog } from './hud/professions/profession_event_lines_core';
 //
 // Classification rule (per the SimEvent comment on the 'log' variant, src/sim/types.ts):
@@ -73,13 +74,8 @@ export interface LogEventCue {
   banner: 'hud.system.moonbridgeBanner' | 'hud.system.customAwardBanner' | null;
 }
 
-/** A private realm's player-awarded achievement announcement
- *  (server/custom_award_command.ts customAwardAnnouncement). */
-export const CUSTOM_AWARD_ANNOUNCEMENT =
-  /^ACHIEVEMENT UNLOCKED! (.+?) has earned "(.+)"! Awarded by (.+)\.$/;
-
 export function logEventCue(text: string): LogEventCue {
-  if (CUSTOM_AWARD_ANNOUNCEMENT.test(text))
+  if (parseCustomAwardAnnouncement(text))
     return { sound: 'achievement', banner: 'hud.system.customAwardBanner' };
   if (text === CHEAT_DEATH_SAVE_TEXT) return { sound: 'fiestaRevive', banner: null };
   // Sundering completion (the weld: profession_event_lines_core.ts).
